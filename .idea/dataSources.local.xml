@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="Rails hmail: development" uuid="c36d3ff7-7ad8-4934-beb4-af34e1f67015">
+      <first-sync>true</first-sync>
+    </data-source>
+    <data-source name="Rails hmail: test" uuid="e82dfd35-32a4-462c-a3ff-5549ef4c8c5f">
+      <first-sync>true</first-sync>
+    </data-source>
+    <data-source name="Rails hmail: production" uuid="37e6775a-4895-4f62-b5b1-b560ad2afb0d">
+      <first-sync>true</first-sync>
+      <user-name>hmail</user-name>
+      <user-password>df96df8fdf97df8adfefdfe4dffcdff1df8ddfe2dfe7dfebdfe3dfe6dff5dfeedfebdffedfebdfe8dfebdff9dfefdff5dffadfebdff9dff9dffddfe5dff8dfeedf8ddff7df8adf8fdf94</user-password>
+    </data-source>
+  </component>
+</project>
