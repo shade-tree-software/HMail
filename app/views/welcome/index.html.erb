@@ -1,4 +1,5 @@
-<h2>Hello World</h2>
+<h2>Hello <%= current_user.email %></h2>
 <p>
   The time is now: <%= Time.now %>
 </p>
+<%= link_to "My Emails", emails_path %>
