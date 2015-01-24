@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   resources :friends
 
   resources :emails do
+    member do
+      get 'archive'
+    end
     collection do
       get 'refresh'
     end

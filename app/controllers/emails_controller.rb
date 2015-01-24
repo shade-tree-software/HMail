@@ -1,7 +1,7 @@
 require 'mail'
 
 class EmailsController < ApplicationController
-  before_action :set_email, only: [:show, :edit, :update, :destroy]
+  before_action :set_email, only: [:show, :edit, :update, :destroy, :archive]
 
   respond_to :html
 
@@ -9,15 +9,20 @@ class EmailsController < ApplicationController
     my_emails = Email.where(:user_id => current_user.id)
     friends = Friend.all.collect { |friend| friend.email }
     inbox = []
+    archived = []
     unknown = []
     my_emails.each do |email|
       if email.from.in? friends
-        inbox << email
+        if email.archived
+          archived << email
+        else
+          inbox << email
+        end
       else
         unknown << email
       end
     end
-    @emails = {:inbox => inbox, :unknown => unknown}
+    @emails = {:inbox => inbox, :archived => archived, :unknown => unknown}
     respond_with(my_emails)
   end
 
@@ -47,6 +52,11 @@ class EmailsController < ApplicationController
   def destroy
     @email.destroy
     respond_with(@email)
+  end
+
+  def archive
+    @email.update(:archived => true)
+    redirect_to :action => :index
   end
 
   def refresh
