@@ -9,6 +9,10 @@ class Email < ActiveRecord::Base
     Mail.read_from_string(self.body).from[0]
   end
 
+  def date
+    Mail.read_from_string(self.body).date
+  end
+
   def text
     parts = Mail.read_from_string(self.body).parts
     body_text = ''

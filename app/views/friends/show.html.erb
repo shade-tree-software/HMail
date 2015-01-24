@@ -1,0 +1,16 @@
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @email.first_name + ' ' + @email.last_name %>
+</p>
+
+<p>
+  <strong>Email Address:</strong>
+  <%= @email.email %>
+</p>
+
+<%= link_to 'Back', friends_path %>
+
+

@@ -3,4 +3,5 @@
   The time is now: <%= Time.now %>
 </p>
 <%= link_to "My Emails", emails_path %>
+<%= link_to "Approved Friends", friends_path if current_user.admin? %>
 <%= link_to "New User", new_registration_path(:user) if current_user.admin? %>
