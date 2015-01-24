@@ -1,7 +1,6 @@
 require 'mail'
 
 class EmailsController < ApplicationController
-  include Devise::Controllers::Helpers
   before_action :set_email, only: [:show, :edit, :update, :destroy]
 
   respond_to :html

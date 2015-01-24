@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
   # :recoverable,
   # :rememberable,
   :trackable, :validatable
+  validates :email_pw, confirmation: true
+  validates :email_pw_confirmation, presence: true
 
   has_many :emails
 end

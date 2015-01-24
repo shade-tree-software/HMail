@@ -14,6 +14,11 @@
     <p class="alert alert-danger"><%= alert %></p>
 <% end %>
 <%= yield %>
+<%= link_to "Home", '/' unless params[:controller] == 'welcome' && params[:action] == 'index'%>
 <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+
+<!-- jQuery -->
+<script type="text/javascript" charset="utf8" src="jquery.js"></script>
+
 </body>
 </html>
