@@ -6,8 +6,19 @@ class EmailsController < ApplicationController
   respond_to :html
 
   def index
-    @emails = Email.where(:user_id => current_user.id)
-    respond_with(@emails)
+    my_emails = Email.where(:user_id => current_user.id)
+    friends = Friend.all.collect { |friend| friend.email }
+    inbox = []
+    unknown = []
+    my_emails.each do |email|
+      if email.from.in? friends
+        inbox << email
+      else
+        unknown << email
+      end
+    end
+    @emails = {:inbox => inbox, :unknown => unknown}
+    respond_with(my_emails)
   end
 
   def show
@@ -39,17 +50,21 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    a= current_user.email
-    b= current_user.email_pw
+    user_name = current_user.email
+    password = current_user.email_pw
     Mail.defaults do
       retriever_method :pop3,
                        {:address => "pop.gmail.com",
                         :port => 995,
-                        :user_name => a,
-                        :password => b,
+                        :user_name => user_name,
+                        :password => password,
                         :enable_ssl => true}
     end
-    Email.create(:body => Mail.first.to_s, :user_id => current_user.id)
+    emails = [Mail.last]
+    #emails = Mail.all
+    emails.each do |email|
+      Email.create(:body => email.to_s, :user_id => current_user.id)
+    end
     redirect_to :action => :index
   end
 

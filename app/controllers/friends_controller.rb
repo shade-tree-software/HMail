@@ -5,7 +5,7 @@ class FriendsController < ApplicationController
 
   def index
     @friends = Friend.all
-    respond_with(@fiends)
+    respond_with(@friends)
   end
 
   def show

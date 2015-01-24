@@ -1,7 +1,8 @@
 <script>
     $(document).ready(function () {
-        $('#emails_table').DataTable();
-        $( "#tabs" ).tabs();
+        var table = $('.emails_table').DataTable();
+        table.order([0, 'desc']).draw();
+        $("#tabs").tabs();
     });
 </script>
 
@@ -11,24 +12,24 @@
 
 <div id="tabs">
   <ul>
-    <li><a href="#fragment-1">One</a></li>
-    <li><a href="#fragment-2">Two</a></li>
-    <li><a href="#fragment-3">Three</a></li>
+    <li><a href="#inbox">Inbox (<%=@emails[:inbox].size%>)</a></li>
+    <li><a href="#archived">Archived</a></li>
+    <li><a href="#unknown">Unknown (<%=@emails[:unknown].size%>)</a></li>
   </ul>
 
-  <div id="fragment-1">
-    <table id="emails_table">
+  <div id="inbox">
+    <table class="emails_table">
       <thead>
       <tr>
-        <th>Date</th>
-        <th>From</th>
-        <th>Subject</th>
+        <th class="dt-head-left" >Date</th>
+        <th class="dt-head-left" >From</th>
+        <th class="dt-head-left" >Subject</th>
         <th colspan="1"></th>
       </tr>
       </thead>
 
       <tbody>
-      <% @emails.each do |email| %>
+      <% @emails[:inbox].each do |email| %>
           <tr>
             <td><%= email.date %></td>
             <td><%= email.from %></td>
@@ -40,14 +41,29 @@
     </table>
   </div>
 
-  <div id="fragment-2">
+  <div id="archived">
     Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
     magna aliquam erat volutpat.
   </div>
 
-  <div id="fragment-3">
-    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-    magna aliquam erat volutpat.
+  <div id="unknown">
+    <table class="emails_table">
+      <thead>
+      <tr>
+        <th class="dt-head-left" >Date</th>
+        <th class="dt-head-left" >From</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @emails[:unknown].each do |email| %>
+          <tr>
+            <td><%= email.friendly_date %></td>
+            <td><%= email.from %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
   </div>
 </div>
 

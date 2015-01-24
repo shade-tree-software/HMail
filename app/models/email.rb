@@ -10,14 +10,23 @@ class Email < ActiveRecord::Base
   end
 
   def date
-    Mail.read_from_string(self.body).date
+    Mail.read_from_string(self.body).date.to_i
+  end
+
+  def friendly_date
+    Mail.read_from_string(self.body).date.to_time.localtime.ctime
   end
 
   def text
-    parts = Mail.read_from_string(self.body).parts
+    mail = Mail.read_from_string(self.body)
     body_text = ''
-    parts.each do |part|
-      body_text << part.decoded if part.content_type.start_with? 'text/plain'
+    if mail.multipart?
+      mail.parts.each do |part|
+        body_text << part.decoded if part.content_type.start_with? 'text/plain'
+      end
+    else
+      body_text = mail.decoded
+      body_text = body_text.gsub(/>\s*/, '>').gsub(/\s*</, '<') if mail.content_type.start_with? 'text/html'
     end
     body_text
   end
