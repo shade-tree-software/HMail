@@ -7,82 +7,78 @@
 </div>
 
 <div role="main" class="ui-content">
-  <div id="tabs">
-    <ul>
-      <li><a href="#inbox">Inbox (<%= @emails[:inbox].size %>)</a></li>
-      <li><a href="#archived">Archived (<%= @emails[:archived].size %>)</a></li>
-      <li><a href="#unknown">Unknown (<%= @emails[:unknown].size %>)</a></li>
-    </ul>
 
-    <div id="inbox">
-      <table class="emails_table">
-        <thead>
-        <tr>
-          <th class="dt-head-left">Date</th>
-          <th class="dt-head-left">From</th>
-          <th class="dt-head-left">Subject</th>
-          <th></th>
-          <th></th>
-        </tr>
-        </thead>
+  <div id="inbox" data-role="collapsible">
+    <h3>Inbox (<%= @emails[:inbox].size %>)</h3>
+    <table class="emails_table">
+      <thead>
+      <tr>
+        <th class="dt-head-left">Date</th>
+        <th class="dt-head-left">From</th>
+        <th class="dt-head-left">Subject</th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
 
-        <tbody>
-        <% @emails[:inbox].each do |email| %>
-            <tr>
-              <td><%= email.friendly_date %></td>
-              <td><%= email.from %></td>
-              <td><%= email.subject %></td>
-              <td><%= link_to 'Show', email %></td>
-              <td><%= link_to 'Archive', archive_email_path(email) %></td>
-            </tr>
-        <% end %>
-        </tbody>
-      </table>
-    </div>
+      <tbody>
+      <% @emails[:inbox].each do |email| %>
+          <tr>
+            <td><%= email.friendly_date %></td>
+            <td><%= email.from %></td>
+            <td><%= email.subject %></td>
+            <td><%= link_to 'Show', email %></td>
+            <td><%= link_to 'Archive', archive_email_path(email) %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 
-    <div id="archived">
-      <table class="emails_table">
-        <thead>
-        <tr>
-          <th class="dt-head-left">Date</th>
-          <th class="dt-head-left">From</th>
-          <th class="dt-head-left">Subject</th>
-          <th colspan="1"></th>
-        </tr>
-        </thead>
+  <div id="archived" data-role="collapsible">
+    <h3>Archived (<%= @emails[:archived].size %>)</h3>
+    <table class="emails_table">
+      <thead>
+      <tr>
+        <th class="dt-head-left">Date</th>
+        <th class="dt-head-left">From</th>
+        <th class="dt-head-left">Subject</th>
+        <th colspan="1"></th>
+      </tr>
+      </thead>
 
-        <tbody>
-        <% @emails[:archived].each do |email| %>
-            <tr>
-              <td><%= email.friendly_date %></td>
-              <td><%= email.from %></td>
-              <td><%= email.subject %></td>
-              <td><%= link_to 'Show', email %></td>
-            </tr>
-        <% end %>
-        </tbody>
-      </table>
-    </div>
+      <tbody>
+      <% @emails[:archived].each do |email| %>
+          <tr>
+            <td><%= email.friendly_date %></td>
+            <td><%= email.from %></td>
+            <td><%= email.subject %></td>
+            <td><%= link_to 'Show', email %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 
-    <div id="unknown">
-      <table class="emails_table">
-        <thead>
-        <tr>
-          <th class="dt-head-left">Date</th>
-          <th class="dt-head-left">From</th>
-        </tr>
-        </thead>
+  <div id="unknown" data-role="collapsible">
+    <h3>Unknown (<%= @emails[:unknown].size %>)</h3>
+    <table class="emails_table">
+      <thead>
+      <tr>
+        <th class="dt-head-left">Date</th>
+        <th class="dt-head-left">From</th>
+      </tr>
+      </thead>
 
-        <tbody>
-        <% @emails[:unknown].each do |email| %>
-            <tr>
-              <td><%= email.friendly_date %></td>
-              <td><%= email.from %></td>
-            </tr>
-        <% end %>
-        </tbody>
-      </table>
-    </div>
+      <tbody>
+      <% @emails[:unknown].each do |email| %>
+          <tr>
+            <td><%= email.friendly_date %></td>
+            <td><%= email.from %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
   </div>
   <%= link_to 'Refresh', refresh_emails_path, :class => 'please_wait' %>
 </div>
@@ -91,6 +87,5 @@
     $(document).ready(function () {
         //var table = $('.emails_table').DataTable({responsive:true});
         //table.order([0, 'desc']).draw();
-        $("#tabs").tabs();
     });
 </script>
