@@ -7,7 +7,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
   before_filter :configure_permitted_parameters
 
   def require_admin
-    current_user == :admin
+    unless current_user.admin
+      flash[:alert] = "Admin Required"
+      redirect_to '/'
+    end
   end
 
   # GET /resource/sign_up
