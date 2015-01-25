@@ -1,27 +1,30 @@
 <script>
-    $(document).ready( function () {
+    $(document).ready(function () {
         email_text_elem = $('#email_text');
         email_text_elem.html(email_text_elem.text().replace(/\n\r?/g, '<br />'));
         console.log(email_text_elem.text());
-    } );
+    });
 </script>
 
-<p id="notice"><%= notice %></p>
+<div data-role="header">
+  <p id="notice"><%= notice %></p>
+</div>
 
-<p>
-  <strong>From:</strong>
-  <%= @email.from %>
-</p>
+<div role="main" class="ui-content">
+  <p>
+    <strong>From:</strong>
+    <%= @email.from %>
+  </p>
 
-<p>
-  <strong>Subject:</strong>
-  <%= @email.subject %>
-</p>
+  <p>
+    <strong>Subject:</strong>
+    <%= @email.subject %>
+  </p>
 
-<p id="email_text">
-  <%= @email.text %>
-</p>
+  <p id="email_text">
+    <%= @email.text %>
+  </p>
 
-<%= link_to 'Back', emails_path %>
-
+  <%= link_to 'Back', emails_path %>
+</div>
 

@@ -6,28 +6,32 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" type="text/css" href="jquery.dataTables.min.css">
-  <link rel="stylesheet" type="text/css" href="jquery-ui.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
+  <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
-<body>
-<% if notice %>
-    <p class="alert alert-success"><%= notice %></p>
-<% end %>
-<% if alert %>
-    <p class="alert alert-danger"><%= alert %></p>
-<% end %>
-<%= yield %>
-<% if user_signed_in? %>
-<%= link_to "Home", '/' unless params[:controller] == 'welcome' && params[:action] == 'index'%>
-<%= link_to "Logout", destroy_user_session_path, method: :delete %>
-<% end %>
-<script type="text/javascript" charset="utf8" src="jquery.js"></script>
-<script type="text/javascript" charset="utf8" src="jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="jquery-ui.min.js"></script>
-<script type="text/javascript" charset="utf8" src="jquery.blockUI.js"></script>
 
+<body>
+<div data-role="page">
+  <div data-role="header">
+    <% if notice %>
+        <p class="alert alert-success"><%= notice %></p>
+    <% end %>
+    <% if alert %>
+        <p class="alert alert-danger"><%= alert %></p>
+    <% end %>
+  </div>
+
+  <%= yield %>
+
+  <div data-role="footer">
+    <% if user_signed_in? %>
+        <%= link_to "Home", '/' unless params[:controller] == 'welcome' && params[:action] == 'index' %>
+        <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+    <% end %>
+  </div>
+</div>
 </body>
 </html>

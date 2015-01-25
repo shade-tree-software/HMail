@@ -1,35 +1,37 @@
-
 <script>
-    $(document).ready( function () {
-        $('#friends_table').DataTable();
-    } );
+    $(document).ready(function () {
+        //$('#friends_table').DataTable();
+    });
 </script>
 
-<p id="notice"><%= notice %></p>
+<div data-role="header">
+  <p id="notice"><%= notice %></p>
 
-<h1>Approved Friends</h1>
+  <h1>Approved Friends</h1>
+</div>
 
-<table id="friends_table">
-  <thead>
+<div role="main" class="ui-content">
+  <table id="friends_table">
+    <thead>
     <tr>
       <th>First Name</th>
       <th>Last Name</th>
       <th>Email Address</th>
       <th colspan="1"></th>
     </tr>
-  </thead>
+    </thead>
 
-  <tbody>
+    <tbody>
     <% @friends.each do |friend| %>
-      <tr>
-        <td><%= friend.first_name %></td>
-        <td><%= friend.last_name %></td>
-        <td><%= friend.email %></td>
-        <td><%= link_to 'Show', friend %></td>
-      </tr>
+        <tr>
+          <td><%= friend.first_name %></td>
+          <td><%= friend.last_name %></td>
+          <td><%= friend.email %></td>
+          <td><%= link_to 'Show', friend %></td>
+        </tr>
     <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
 
-<br>
-<%= link_to 'New', new_friend_path %>
+  <%= link_to 'New', new_friend_path %>
+</div>

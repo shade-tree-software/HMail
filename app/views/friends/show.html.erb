@@ -1,16 +1,18 @@
+<div data-role="header">
+  <p id="notice"><%= notice %></p>
+</div>
 
-<p id="notice"><%= notice %></p>
+<div role="main" class="ui-content">
+  <p>
+    <strong>Name:</strong>
+    <%= @friend.first_name + ' ' + @friend.last_name %>
+  </p>
 
-<p>
-  <strong>Name:</strong>
-  <%= @friend.first_name + ' ' + @friend.last_name %>
-</p>
+  <p>
+    <strong>Email Address:</strong>
+    <%= @friend.email %>
+  </p>
 
-<p>
-  <strong>Email Address:</strong>
-  <%= @friend.email %>
-</p>
+  <%= link_to 'Back', friends_path %>
 
-<%= link_to 'Back', friends_path %>
-
-
+</div>
