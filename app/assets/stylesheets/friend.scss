@@ -1,3 +1,23 @@
 // Place all the styles related to the friend controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.friends-list thead th,
+.friends-list tbody tr:last-child {
+  border-bottom: 1px solid #d6d6d6; /* non-RGBA fallback */
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.friends-list tbody th,
+.friends-list tbody td {
+  border-bottom: 1px solid #e6e6e6; /* non-RGBA fallback  */
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.friends-list tbody tr:last-child th,
+.friends-list tbody tr:last-child td {
+  border-bottom: 0;
+}
+.friends-list tbody tr:nth-child(odd) td,
+.friends-list tbody tr:nth-child(odd) th {
+  background-color: #eeeeee; /* non-RGBA fallback  */
+  background-color: rgba(0,0,0,.04);
+}

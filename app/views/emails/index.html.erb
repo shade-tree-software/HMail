@@ -1,3 +1,4 @@
+
 <div data-role="header">
   <p id="notice"><%= notice %></p>
 
@@ -10,14 +11,13 @@
 
   <div id="inbox" data-role="collapsible">
     <h3>Inbox (<%= @emails[:inbox].size %>)</h3>
-    <table class="emails_table">
+    <table data-role="table" data-mode="reflow" id="inbox-table" class="emails-list">
       <thead>
       <tr>
-        <th class="dt-head-left">Date</th>
-        <th class="dt-head-left">From</th>
-        <th class="dt-head-left">Subject</th>
-        <th></th>
-        <th></th>
+        <th>Date</th>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Archive</th>
       </tr>
       </thead>
 
@@ -26,8 +26,7 @@
           <tr>
             <td><%= email.friendly_date %></td>
             <td><%= email.from %></td>
-            <td><%= email.subject %></td>
-            <td><%= link_to 'Show', email %></td>
+            <td><%= link_to email.subject, email %></td>
             <td><%= link_to 'Archive', archive_email_path(email) %></td>
           </tr>
       <% end %>
@@ -37,23 +36,21 @@
 
   <div id="archived" data-role="collapsible">
     <h3>Archived (<%= @emails[:archived].size %>)</h3>
-    <table class="emails_table">
+    <table data-role="table" data-mode="reflow" id="archived-table" class="emails-list">
       <thead>
       <tr>
-        <th class="dt-head-left">Date</th>
-        <th class="dt-head-left">From</th>
-        <th class="dt-head-left">Subject</th>
-        <th colspan="1"></th>
+        <th>Date</th>
+        <th>From</th>
+        <th>Subject</th>
       </tr>
       </thead>
 
       <tbody>
       <% @emails[:archived].each do |email| %>
-          <tr>
+          <tr >
             <td><%= email.friendly_date %></td>
             <td><%= email.from %></td>
-            <td><%= email.subject %></td>
-            <td><%= link_to 'Show', email %></td>
+            <td><%= link_to email.subject, email %></td>
           </tr>
       <% end %>
       </tbody>
@@ -62,11 +59,11 @@
 
   <div id="unknown" data-role="collapsible">
     <h3>Unknown (<%= @emails[:unknown].size %>)</h3>
-    <table class="emails_table">
+    <table data-role="table" data-mode="reflow" id="unknowns-table" class="emails-list">
       <thead>
       <tr>
-        <th class="dt-head-left">Date</th>
-        <th class="dt-head-left">From</th>
+        <th data-priority="1">Date</th>
+        <th>From</th>
       </tr>
       </thead>
 
@@ -80,12 +77,6 @@
       </tbody>
     </table>
   </div>
-  <%= link_to 'Refresh', refresh_emails_path, :class => 'please_wait' %>
+  <br/>
+  <%= link_to 'Check for new emails', refresh_emails_path, :class => 'please_wait' %>
 </div>
-
-<script>
-    $(document).ready(function () {
-        //var table = $('.emails_table').DataTable({responsive:true});
-        //table.order([0, 'desc']).draw();
-    });
-</script>

@@ -11,13 +11,12 @@
 </div>
 
 <div role="main" class="ui-content">
-  <table id="friends_table">
+  <table data-role="table" data-mode="reflow" class="friends-list" id="friends_table">
     <thead>
     <tr>
       <th>First Name</th>
       <th>Last Name</th>
       <th>Email Address</th>
-      <th colspan="1"></th>
     </tr>
     </thead>
 
@@ -26,12 +25,11 @@
         <tr>
           <td><%= friend.first_name %></td>
           <td><%= friend.last_name %></td>
-          <td><%= friend.email %></td>
-          <td><%= link_to 'Show', friend %></td>
+          <td><%= link_to friend.email, friend %></td>
         </tr>
     <% end %>
     </tbody>
   </table>
-
-  <%= link_to 'New', new_friend_path %>
+  <br/>
+  <%= link_to 'Create a new friend', new_friend_path %>
 </div>

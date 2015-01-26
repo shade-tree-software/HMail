@@ -26,5 +26,6 @@
   </p>
 
   <%= link_to 'Back', emails_path %>
+  <%= (link_to 'Archive', archive_email_path(@email)) unless @email.archived %>
 </div>
 
