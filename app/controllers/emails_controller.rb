@@ -1,4 +1,5 @@
 require 'mail'
+require 'friend'
 
 class EmailsController < ApplicationController
   before_action :set_email, only: [:show, :edit, :update, :destroy, :archive]
@@ -11,18 +12,23 @@ class EmailsController < ApplicationController
     inbox = []
     archived = []
     unknown = []
+    sent = []
     my_emails.each do |email|
-      if email.from.in? friends
-        if email.archived
-          archived << email
-        else
-          inbox << email
-        end
+      if email.sent
+        sent << email
       else
-        unknown << email
+        if email.from.in? friends
+          if email.archived
+            archived << email
+          else
+            inbox << email
+          end
+        else
+          unknown << email
+        end
       end
     end
-    @emails = {:inbox => inbox, :archived => archived, :unknown => unknown}
+    @emails = {:inbox => inbox, :archived => archived, :unknown => unknown, :sent => sent}
     respond_with(my_emails)
   end
 
@@ -31,28 +37,54 @@ class EmailsController < ApplicationController
   end
 
   def new
+    @friends = Friend.all.collect do |friend|
+      [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
+    end
     @email = Email.new
     respond_with(@email)
   end
 
-  def edit
-  end
+  #def edit
+  #end
 
   def create
-    @email = Email.new(email_params)
+    sender = current_user.email
+    password = current_user.email_pw
+    Mail.defaults do
+      delivery_method :smtp, {:address => "smtp.gmail.com",
+                              :port => 587,
+                              #:domain => 'your.host.name',
+                              :user_name => sender,
+                              :password => password,
+                              :authentication => 'plain',
+                              :enable_starttls_auto => true}
+    end
+    recipient = Friend.find(params[:email][:to].to_i).email
+    subj = params[:email][:subject]
+    msg = params[:email][:message]
+    mail = Mail.new do
+      to recipient
+      from sender
+      subject subj
+      body msg
+    end
+
+    rsp = mail.deliver!
+
+    @email = Email.new(:body => mail.to_s, :user_id => current_user.id, :archived => false, :sent => true)
     @email.save
     respond_with(@email)
   end
 
-  def update
-    @email.update(email_params)
-    respond_with(@email)
-  end
+  #def update
+  #  @email.update(email_params)
+  #  respond_with(@email)
+  #end
 
-  def destroy
-    @email.destroy
-    respond_with(@email)
-  end
+  #def destroy
+  #  @email.destroy
+  #  respond_with(@email)
+  #end
 
   def archive
     @email.update(:archived => true)
@@ -73,7 +105,7 @@ class EmailsController < ApplicationController
     emails = [Mail.last]
     #emails = Mail.all
     emails.each do |email|
-      Email.create(:body => email.to_s, :user_id => current_user.id)
+      Email.create(:body => email.to_s, :user_id => current_user.id, :archived => false, :sent => false)
     end
     redirect_to :action => :index
   end

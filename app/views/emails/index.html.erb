@@ -31,6 +31,29 @@
     </table>
   </div>
 
+  <div id="sent" data-role="collapsible">
+    <h3>Sent (<%= @emails[:sent].size %>)</h3>
+    <table data-role="table" data-mode="reflow" id="sent-table" class="emails-list ui-responsive">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>To</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @emails[:sent].each do |email| %>
+          <tr>
+            <td><%= email.friendly_date %></td>
+            <td><%= email.to %></td>
+            <td><%= link_to email.subject, email %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
   <div id="archived" data-role="collapsible">
     <h3>Archived (<%= @emails[:archived].size %>)</h3>
     <table data-role="table" data-mode="reflow" id="archived-table" class="emails-list ui-responsive">
@@ -75,5 +98,7 @@
     </table>
   </div>
   <br/>
-  <%= link_to 'Check for new emails', refresh_emails_path, :class => 'please_wait' %>
+  <%= link_to 'Compose a message', new_email_url %><br/><br/>
+
+  <%= link_to 'Check for new messages', refresh_emails_path, :class => 'please_wait' %>
 </div>

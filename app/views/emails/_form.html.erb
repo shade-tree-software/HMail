@@ -1,25 +1,29 @@
 <%= form_for(@email) do |f| %>
-  <% if @email.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@email.errors.count, "error") %> prohibited this email from being saved:</h2>
+    <% if @email.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@email.errors.count, "error") %> prohibited this email from being saved:</h2>
 
-      <ul>
-      <% @email.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
+          <ul>
+            <% @email.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :to %>
+      <%= f.select(:to, @friends) %>
     </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :body %>
-    <%= f.text_field :body %>
-  </div>
-  <div class="field">
-    <%= f.label :user_id %>
-    <%= f.number_field :user_id %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+    <div class="field">
+      <%= f.label :subject %>
+      <%= f.text_field :subject %>
+    </div>
+    <div class="field">
+      <%= f.label :message %>
+      <%= f.text_area :message %>
+    </div>
+    <div class="actions">
+      <%= f.submit 'Send' %>
+    </div>
 <% end %>

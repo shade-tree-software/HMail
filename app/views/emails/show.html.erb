@@ -12,8 +12,18 @@
 
 <div role="main" class="ui-content">
   <p>
-    <strong>From:</strong>
-    <%= @email.from %>
+    <strong>Date:</strong>
+    <%= @email.friendly_date %>
+  </p>
+
+  <p>
+    <% if @email.sent %>
+        <strong>To:</strong>
+        <%= @email.to %>
+    <% else %>
+        <strong>From:</strong>
+        <%= @email.from %>
+    <% end %>
   </p>
 
   <p>
@@ -25,7 +35,8 @@
     <%= @email.text %>
   </p>
 
+  <br/>
   <%= link_to 'Back', emails_path %>
-  <%= (link_to 'Archive', archive_email_path(@email)) unless @email.archived %>
+  <%= (link_to 'Archive', archive_email_path(@email)) unless @email.archived || @email.sent %>
 </div>
 
