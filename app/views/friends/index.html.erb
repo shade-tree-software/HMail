@@ -4,13 +4,11 @@
     });
 </script>
 
-<div data-role="header">
-  <p id="notice"><%= notice %></p>
-
-  <h1>Approved Friends</h1>
-</div>
 
 <div role="main" class="ui-content">
+  <h2>Approved Friends</h2>
+  <%= link_to 'Create a new friend', new_friend_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
+
   <table data-role="table" data-mode="reflow" class="friends-list ui-responsive" id="friends_table">
     <thead>
     <tr>
@@ -30,6 +28,4 @@
     <% end %>
     </tbody>
   </table>
-  <br/>
-  <%= link_to 'Create a new friend', new_friend_path %>
 </div>

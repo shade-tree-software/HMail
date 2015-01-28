@@ -6,11 +6,11 @@
     });
 </script>
 
-<div data-role="header">
-  <p id="notice"><%= notice %></p>
-</div>
-
 <div role="main" class="ui-content">
+  <% unless @email.archived || @email.sent %>
+      <%= link_to 'Archive', archive_email_path(@email), :class => 'ui-btn ui-btn-inline ui-corner-all' %>
+  <% end %>
+
   <p>
     <strong>Date:</strong>
     <%= @email.friendly_date %>
@@ -35,8 +35,5 @@
     <%= @email.text %>
   </p>
 
-  <br/>
-  <%= link_to 'Back', emails_path %>
-  <%= (link_to 'Archive', archive_email_path(@email)) unless @email.archived || @email.sent %>
 </div>
 

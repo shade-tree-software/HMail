@@ -1,8 +1,6 @@
-<div data-role="header">
-  <p id="notice"><%= notice %></p>
-</div>
 
 <div role="main" class="ui-content">
+  <h2>Friend</h2>
   <p>
     <strong>Name:</strong>
     <%= @friend.first_name + ' ' + @friend.last_name %>
@@ -13,6 +11,5 @@
     <%= @friend.email %>
   </p>
 
-  <%= link_to 'Back', friends_path %>
 
 </div>

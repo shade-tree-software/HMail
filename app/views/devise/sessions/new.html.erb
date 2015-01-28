@@ -1,8 +1,8 @@
-<div data-role="header">
-  <h2>Log in</h2>
-</div>
+
 
 <div role="main" class="ui-content">
+  <h2>Please Log in</h2>
+
   <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
       <div class="field">
         <%= f.label :email %>
@@ -22,7 +22,7 @@
       <% end -%>
 
       <div class="actions">
-        <%= f.submit "Log in" %>
+        <%= f.submit "Log in", 'data-inline' => :true %>
       </div>
   <% end %>
 

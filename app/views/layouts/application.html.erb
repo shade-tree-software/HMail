@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hmail</title>
+  <title>Hamilton Mail</title>
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
@@ -16,11 +16,18 @@
 <body>
 <div data-role="page">
   <div data-role="header">
-    <% if notice %>
-        <p class="alert alert-success"><%= notice %></p>
-    <% end %>
-    <% if alert %>
-        <p class="alert alert-danger"><%= alert %></p>
+    <h1>Hamilton Mail</h1>
+    <% if user_signed_in? %>
+        <% if notice %>
+            <p class="alert alert-success"><%= notice %></p>
+        <% end %>
+        <% if alert %>
+            <p class="alert alert-danger"><%= alert %></p>
+        <% end %>
+        <% unless params[:controller] == 'emails' && params[:action] == 'index' %>
+            <%= link_to "Home", '/', :class => 'ui-btn ui-icon-home ui-btn-icon-notext' %>
+            <%= link_to "Back", :back, :class => 'ui-btn ui-icon-back ui-btn-icon-notext' %>
+        <% end %>
     <% end %>
   </div>
 
@@ -28,7 +35,10 @@
 
   <div data-role="footer">
     <% if user_signed_in? %>
-        <%= link_to "Home", '/' unless params[:controller] == 'welcome' && params[:action] == 'index' %>
+        <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
+            <%= link_to "Approved Friends", friends_path %>
+            <%= link_to "New User", new_registration_path(:user) %>
+        <% end %>
         <%= link_to "Logout", destroy_user_session_path, method: :delete %>
     <% end %>
   </div>
