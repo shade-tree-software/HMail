@@ -1,7 +1,7 @@
 <div role="main" class="ui-content">
   <h2><%= current_user.email %></h2>
   <%= link_to 'Compose a message', new_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
-  <%= link_to 'Check for new messages', refresh_emails_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
+  <%= link_to 'Check for new messages', refresh_emails_url, :class => 'ui-btn ui-btn-inline ui-corner-all always-reload' %>
 
   <div id="inbox" data-role="collapsible">
     <h3>Inbox (<%= @emails[:inbox].size %>)</h3>
@@ -94,3 +94,10 @@
     </table>
   </div>
 </div>
+
+<script>
+  $(".always-reload").click(function(event){
+      event.preventDefault();
+      window.location.assign($(this).attr('href'));
+  })
+</script>

@@ -8,9 +8,9 @@ class FriendsController < ApplicationController
     respond_with(@friends)
   end
 
-  def show
-    respond_with(@friend)
-  end
+  #def show
+  #  respond_with(@friend)
+  #end
 
   def new
     @friend = Friend.new

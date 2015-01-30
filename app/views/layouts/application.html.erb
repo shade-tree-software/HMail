@@ -19,10 +19,10 @@
     <h1>Hamilton Mail</h1>
     <% if user_signed_in? %>
         <% if notice %>
-            <p class="alert alert-success"><%= notice %></p>
+            <p style="color:green" class="alert alert-success"><%= notice %></p>
         <% end %>
         <% if alert %>
-            <p class="alert alert-danger"><%= alert %></p>
+            <p style="color:red" class="alert alert-danger"><%= alert %></p>
         <% end %>
         <% unless params[:controller] == 'emails' && params[:action] == 'index' %>
             <%= link_to "Home", '/', :class => 'ui-btn ui-icon-home ui-btn-icon-notext' %>

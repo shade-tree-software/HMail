@@ -103,12 +103,20 @@ class EmailsController < ApplicationController
                         :password => password,
                         :enable_ssl => true}
     end
-    #emails = [Mail.last]
-    emails = Mail.all
-    emails.each do |email|
-      Email.create(:body => email.to_s, :user_id => current_user.id, :archived => false, :sent => false)
+
+    begin
+      emails = Mail.all
+      if emails
+        emails.each do |email|
+          Email.create(:body => email.to_s, :user_id => current_user.id, :archived => false, :sent => false)
+        end
+        redirect_to emails_path, notice: "You have #{emails.size} new #{'email'.pluralize(emails.size)}"
+      else
+        redirect_to emails_path, notice: 'You have no new emails'
+      end
+    rescue Exception => e
+      redirect_to emails_path, alert: "Unable to refresh: #{e.message}"
     end
-    redirect_to :action => :index
   end
 
   private
