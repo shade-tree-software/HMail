@@ -1,4 +1,5 @@
 require 'mail'
+require 'userfriend'
 require 'friend'
 
 class EmailsController < ApplicationController
@@ -8,7 +9,7 @@ class EmailsController < ApplicationController
 
   def index
     my_emails = Email.where(:user_id => current_user.id)
-    friends = Friend.all.collect { |friend| friend.email }
+    friends = current_user.friends.collect { |friend| friend.email }
     inbox = []
     archived = []
     unknown = []
@@ -37,7 +38,7 @@ class EmailsController < ApplicationController
   end
 
   def new
-    @friends = Friend.all.collect do |friend|
+    @friends = current_user.friends.collect do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
     end
     @email = Email.new
@@ -69,7 +70,7 @@ class EmailsController < ApplicationController
       body msg
     end
 
-    rsp = mail.deliver!
+    mail.deliver!
 
     @email = Email.new(:body => mail.to_s, :user_id => current_user.id, :archived => false, :sent => true)
     @email.save
@@ -102,8 +103,8 @@ class EmailsController < ApplicationController
                         :password => password,
                         :enable_ssl => true}
     end
-    emails = [Mail.last]
-    #emails = Mail.all
+    #emails = [Mail.last]
+    emails = Mail.all
     emails.each do |email|
       Email.create(:body => email.to_s, :user_id => current_user.id, :archived => false, :sent => false)
     end

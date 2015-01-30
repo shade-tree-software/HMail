@@ -17,7 +17,12 @@ class Email < ActiveRecord::Base
     if self.body.nil?
       ''
     else
-      Mail.read_from_string(self.body).from[0]
+      sender = Mail.read_from_string(self.body).from
+      if sender.is_a? Array
+        sender[0]
+      else
+        sender
+      end
     end
   end
 
@@ -43,10 +48,10 @@ class Email < ActiveRecord::Base
   end
 
   def friendly_date
-    if self.body.nil?
-      Time.new(0).localtime.ctime
-    else
+    begin
       Mail.read_from_string(self.body).date.to_time.localtime.ctime
+    rescue
+      Time.new(0).localtime.ctime
     end
   end
 
@@ -55,16 +60,19 @@ class Email < ActiveRecord::Base
       ''
     else
       mail = Mail.read_from_string(self.body)
-      body_text = ''
       if mail.multipart?
-        mail.parts.each do |part|
-          body_text << part.decoded if part.content_type.start_with? 'text/plain'
-        end
+        parts = mail.parts
       else
-        body_text = mail.decoded
-        body_text = body_text.gsub(/>\s*/, '>').gsub(/\s*</, '<') if mail.content_type.start_with? 'text/html'
+        parts = [mail]
       end
-      body_text
+      parts.collect do |part|
+        if part.content_type.start_with? 'text/plain'
+          part.decoded
+        else
+          "<p style=\"color:red\">Attachment Removed:[#{part.content_type}]</p>"
+        end
+      end.join("\n")
+      #body_text = body_text.gsub(/>\s*/, '>').gsub(/\s*</, '<') if mail.content_type.start_with? 'text/html'
     end
   end
 
