@@ -8,7 +8,8 @@
 
 <div role="main" class="ui-content">
   <% unless @email.archived || @email.sent %>
-      <%= link_to 'Archive', archive_email_path(@email), :class => 'ui-btn ui-btn-inline ui-corner-all' %>
+      <%= link_to 'Archive', archive_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
+      <%= link_to 'Reply', reply_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
   <% end %>
 
   <p>
@@ -32,7 +33,7 @@
   </p>
 
   <p id="email_text">
-    <%= @email.text %>
+    <%= @email.text(:show_warnings => true) %>
   </p>
 
 </div>

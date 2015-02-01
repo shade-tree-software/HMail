@@ -13,15 +13,15 @@
 
     <div class="field">
       <%= f.label :to %>
-      <%= f.select(:to, @friends) %>
+      <%= f.select(:to, @params[:recipients]) %>
     </div>
     <div class="field">
       <%= f.label :subject %>
-      <%= f.text_field :subject %>
+      <%= f.text_field :subject, :value => @params[:subject] %>
     </div>
     <div class="field">
       <%= f.label :message %>
-      <%= f.text_area :message %>
+      <%= f.text_area :message, :value => @params[:reply_text], :autofocus => @params[:is_reply] %>
     </div>
     <div class="actions">
       <%= f.submit 'Send', 'data-inline' => :true %>

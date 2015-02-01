@@ -1,5 +1,5 @@
 <div role="main" class="ui-content">
-  <h2>New Email</h2>
+  <h2><%= @params[:is_reply] ? 'Reply' : 'New Email' %></h2>
 
   <%= render 'form' %>
 

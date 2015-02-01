@@ -3,7 +3,7 @@ require 'userfriend'
 require 'friend'
 
 class EmailsController < ApplicationController
-  before_action :set_email, only: [:show, :edit, :update, :destroy, :archive]
+  before_action :set_email, only: [:show, :edit, :update, :destroy, :archive, :reply]
 
   respond_to :html
 
@@ -37,12 +37,21 @@ class EmailsController < ApplicationController
     respond_with(@email)
   end
 
+
   def new
-    @friends = current_user.friends.collect do |friend|
+    friends = current_user.friends.collect do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
     end
+    @params = {:recipients => friends}
     @email = Email.new
     respond_with(@email)
+  end
+
+  def reply
+    @params = @email.build_reply
+    @email = Email.new
+    render :action => :new
+    #respond_with(@email)
   end
 
   #def edit

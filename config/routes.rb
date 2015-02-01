@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :emails do
     member do
       get 'archive'
+      get 'reply'
     end
     collection do
       get 'refresh'
