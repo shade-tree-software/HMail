@@ -102,30 +102,8 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    user_name = current_user.email
-    password = current_user.email_pw
-    Mail.defaults do
-      retriever_method :pop3,
-                       {:address => "pop.gmail.com",
-                        :port => 995,
-                        :user_name => user_name,
-                        :password => password,
-                        :enable_ssl => true}
-    end
-
-    begin
-      emails = Mail.all
-      if emails
-        emails.each do |email|
-          Email.create(:body => email.to_s, :user_id => current_user.id, :archived => false, :sent => false)
-        end
-        redirect_to emails_path, notice: "You have #{emails.size} new #{'email'.pluralize(emails.size)}"
-      else
-        redirect_to emails_path, notice: 'You have no new emails'
-      end
-    rescue Exception => e
-      redirect_to emails_path, alert: "Unable to refresh: #{e.message}"
-    end
+    PopJob.perform_later current_user
+    redirect_to :action => :index
   end
 
   private

@@ -49,3 +49,4 @@ ruby '2.2.0'
 
 gem 'unicorn'
 gem 'devise'
+gem "queue_classic", "~> 3.0.0"
