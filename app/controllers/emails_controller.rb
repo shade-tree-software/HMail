@@ -1,6 +1,7 @@
 require 'mail'
 require 'userfriend'
 require 'friend'
+require 'queueclassicjob'
 
 class EmailsController < ApplicationController
   before_action :set_email, only: [:show, :edit, :update, :destroy, :archive, :reply]
@@ -102,8 +103,9 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    PopJob.perform_later current_user
-    redirect_to :action => :index
+    users_queued = QueueClassicJob.select(:args).collect {|job| job.args[0]['arguments'][0]}
+    PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
+    render nothing: true
   end
 
   private

@@ -74,6 +74,7 @@
 
   <div id="unknown" data-role="collapsible">
     <h3>Unknown (<%= @emails[:unknown].size %>)</h3>
+
     <p style="color: red">Messages from unknown senders will be removed after one week</p>
     <table data-role="table" data-mode="reflow" id="unknowns-table" class="emails-list ui-responsive">
       <thead>
@@ -96,8 +97,12 @@
 </div>
 
 <script>
-  $(".always-reload").click(function(event){
-      event.preventDefault();
-      window.location.assign($(this).attr('href'));
-  })
+    (function () {
+        $.get("/emails/refresh");
+        setInterval(function () {
+            $.get("/emails/refresh");
+        }, 60000);
+    }());
+
+
 </script>

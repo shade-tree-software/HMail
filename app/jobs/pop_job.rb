@@ -1,7 +1,10 @@
+require 'user'
+
 class PopJob < ActiveJob::Base
   queue_as :default
 
-  def perform(user)
+  def perform(user_id)
+    user = User.find(user_id)
     user_name = user.email
     password = user.email_pw
     Mail.defaults do
