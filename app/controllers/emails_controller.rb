@@ -6,7 +6,11 @@ require 'queueclassicjob'
 class EmailsController < ApplicationController
   before_action :set_email, only: [:show, :edit, :update, :destroy, :archive, :reply]
 
-  respond_to :html
+  respond_to :html, :json
+
+  class EmailLite
+    attr_accessor :subject, :to, :from, :friendly_date
+  end
 
   def index
     my_emails = Email.where(:user_id => current_user.id)
@@ -15,7 +19,14 @@ class EmailsController < ApplicationController
     archived = []
     unknown = []
     sent = []
+    lite_emails = []
     my_emails.each do |email|
+      lite_email = EmailLite.new
+      lite_email.subject = email.subject
+      lite_email.to = email.to
+      lite_email.from = email.from
+      lite_email.friendly_date = email.friendly_date
+      lite_emails << lite_email
       if email.sent
         sent << email
       else
@@ -31,7 +42,7 @@ class EmailsController < ApplicationController
       end
     end
     @emails = {:inbox => inbox, :archived => archived, :unknown => unknown, :sent => sent}
-    respond_with(my_emails)
+    respond_with(lite_emails)
   end
 
   def show
@@ -103,7 +114,7 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    users_queued = QueueClassicJob.select(:args).collect {|job| job.args[0]['arguments'][0]}
+    users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
     PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
     render nothing: true
   end

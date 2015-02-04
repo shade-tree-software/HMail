@@ -3,6 +3,9 @@
   <%= link_to 'Compose a message', new_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
   <%= link_to 'Check for new messages', refresh_emails_url, :class => 'ui-btn ui-btn-inline ui-corner-all always-reload' %>
 
+  <div id="all_emails">
+  </div>
+
   <div id="inbox" data-role="collapsible">
     <h3>Inbox (<%= @emails[:inbox].size %>)</h3>
     <table data-role="table" data-mode="reflow" id="inbox-table" class="emails-list ui-responsive">
@@ -96,6 +99,12 @@
   </div>
 </div>
 
+<script type="text/template" id="emails-template">
+  <div data-role="collapsible">
+    <h3>All Emails (<%%= email_count %>)</h3>
+  </div>
+</script>
+
 <script>
     (function () {
         $.get("/emails/refresh");
@@ -104,5 +113,27 @@
         }, 60000);
     }());
 
+
+    var Emails = Backbone.Collection.extend({
+        url: '/emails'
+    });
+
+    var EmailsView = Backbone.View.extend({
+        el: '#all_emails',
+        render: function () {
+            var that = this;
+            var emails = new Emails();
+            emails.fetch({
+                success: function (emails) {
+                    var template = _.template($('#emails-template').html(), {email_count: emails.models.length});
+                    that.$el.html(template);
+                    that.$el.enhanceWithin();
+                }
+            })
+        }
+    });
+
+    var emailsView = new EmailsView();
+    emailsView.render();
 
 </script>
