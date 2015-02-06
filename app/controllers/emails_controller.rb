@@ -14,7 +14,10 @@ class EmailsController < ApplicationController
 
   def index
     last_id = params[:last_id] || 0
-    emails = Email.select(:id, :to, :from, :subject, :date, :friendly_date).where(:user_id => current_user.id).where("id > #{last_id}")
+    emails = Email.select(:id, :to, :from, :subject, :date, :friendly_date)
+                 .where(:user_id => current_user.id).where("id > #{last_id}")
+                 .where("\"from\" in (:friends) or \"to\" in (:friends)", friends: current_user.friends.select(:email))
+                 .order(date: :desc)
     #friends = current_user.friends.collect { |friend| friend.email }
     inbox = []
     archived = []
@@ -125,9 +128,9 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    #users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
-    #PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
-    PopJob.perform_later(current_user.id)
+    users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
+    PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
+    #PopJob.perform_later(current_user.id)
     render nothing: true
   end
 
