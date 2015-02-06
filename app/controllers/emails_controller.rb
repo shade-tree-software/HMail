@@ -9,17 +9,19 @@ class EmailsController < ApplicationController
   respond_to :html, :json
 
   class EmailLite
-    attr_accessor :subject, :to, :from, :friendly_date
+    attr_accessor :id, :subject, :to, :from, :friendly_date
   end
 
   def index
-    my_emails = Email.where(:user_id => current_user.id)
-    friends = current_user.friends.collect { |friend| friend.email }
+    last_id = params[:last_id] || 0
+    emails = Email.select(:id, :to, :from, :subject, :date, :friendly_date).where(:user_id => current_user.id).where("id > #{last_id}")
+    #friends = current_user.friends.collect { |friend| friend.email }
     inbox = []
     archived = []
     unknown = []
     sent = []
     lite_emails = []
+=begin
     my_emails.each do |email|
       lite_email = EmailLite.new
       lite_email.subject = email.subject
@@ -41,8 +43,9 @@ class EmailsController < ApplicationController
         end
       end
     end
+=end
     @emails = {:inbox => inbox, :archived => archived, :unknown => unknown, :sent => sent}
-    respond_with(lite_emails)
+    respond_with(emails)
   end
 
   def show
@@ -93,7 +96,15 @@ class EmailsController < ApplicationController
 
     mail.deliver!
 
-    @email = Email.new(:body => mail.to_s, :user_id => current_user.id, :archived => false, :sent => true)
+    @email = Email.new(:body => mail.to_s,
+                       :user_id => current_user.id,
+                       :archived => false,
+                       :sent => true,
+                       :to => recipient,
+                       :from => sender,
+                       :subject => subj,
+                       :date => mail.date.to_i,
+                       :friendly_date => mail.date.to_time.localtime.ctime)
     @email.save
     respond_with(@email)
   end
@@ -114,8 +125,9 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
-    PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
+    #users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
+    #PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
+    PopJob.perform_later(current_user.id)
     render nothing: true
   end
 

@@ -19,7 +19,17 @@ class PopJob < ActiveJob::Base
     emails = Mail.all
     if emails
       emails.each do |email|
-        Email.create(:body => email.to_s, :user_id => user.id, :archived => false, :sent => false)
+        args = {}
+        args[:body] = email.to_s
+        args[:user_id] = user.id
+        args[:archived] = false
+        args[:sent] = false
+        args[:subject] = email.subject
+        args[:to] = email.to.first
+        args[:from] = email.from.first
+        args[:date] = email.date.to_i
+        args[:friendly_date] = email.date.to_time.localtime.ctime
+        Email.create(args)
       end
     end
 

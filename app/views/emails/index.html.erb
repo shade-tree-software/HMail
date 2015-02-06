@@ -1,4 +1,6 @@
 <div role="main" class="ui-content">
+  <span style="color:red" id="warnings"></span>
+
   <h2><%= current_user.email %></h2>
   <%= link_to 'Compose a message', new_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
   <%= link_to 'Check for new messages', refresh_emails_url, :class => 'ui-btn ui-btn-inline ui-corner-all always-reload' %>
@@ -101,39 +103,80 @@
 
 <script type="text/template" id="emails-template">
   <div data-role="collapsible">
-    <h3>All Emails (<%%= email_count %>)</h3>
+    <h3>All Emails (<%%= emails.length %>)</h3>
+    <table data-role="table" data-mode="reflow" id="inbox-table" class="emails-list ui-responsive">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>To</th>
+        <th>From</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% var id = email.get('id');
+      if (id > last_email_id) {
+      last_email_id = id;
+      } %>
+      <tr>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('to') %></td>
+        <td><%%= email.get('from') %></td>
+        <td><%%= email.get('subject') %></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
   </div>
 </script>
 
 <script>
-    (function () {
-        $.get("/emails/refresh");
-        setInterval(function () {
-            $.get("/emails/refresh");
-        }, 60000);
-    }());
 
+    var last_email_id = 0;
 
     var Emails = Backbone.Collection.extend({
         url: '/emails'
     });
+    var emails = new Emails();
+
+    var onFailure = function () {
+        $("#warnings").text("Unable to connect to the server");
+    };
+    var onSuccess = function () {
+        $("#warnings").text("");
+    };
 
     var EmailsView = Backbone.View.extend({
         el: '#all_emails',
         render: function () {
             var that = this;
-            var emails = new Emails();
             emails.fetch({
+                add: true,
+                data: {last_id: last_email_id},
                 success: function (emails) {
-                    var template = _.template($('#emails-template').html(), {email_count: emails.models.length});
+                    onSuccess();
+                    var template = _.template($('#emails-template').html(), {emails: emails.models});
                     that.$el.html(template);
                     that.$el.enhanceWithin();
-                }
+                },
+                error: onFailure()
             })
         }
     });
 
     var emailsView = new EmailsView();
     emailsView.render();
+
+    (function () {
+        $.get("/emails/refresh");
+        setInterval(function () {
+            $.get("/emails/refresh").fail(onFailure()).success(onSuccess());
+        }, 60000);
+        setInterval(function () {
+            emailsView.render();
+        }, 15000);
+    }());
 
 </script>
