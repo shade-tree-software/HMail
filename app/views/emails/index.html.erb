@@ -54,7 +54,7 @@
     <tr>
       <td><%%= email.get('friendly_date') %></td>
       <td><%%= email.get('from') %></td>
-      <td><%%= email.get('subject') %></td>
+      <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
     </tr>
     <%% }); %>
     </tbody>
@@ -80,7 +80,7 @@
     <tr>
       <td><%%= email.get('friendly_date') %></td>
       <td><%%= email.get('to') %></td>
-      <td><%%= email.get('subject') %></td>
+      <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
     </tr>
     <%% }); %>
     </tbody>
@@ -106,7 +106,7 @@
     <tr>
       <td><%%= email.get('friendly_date') %></td>
       <td><%%= email.get('from') %></td>
-      <td><%%= email.get('subject') %></td>
+      <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
     </tr>
     <%% }); %>
     </tbody>
