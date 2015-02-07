@@ -3,112 +3,24 @@
 
   <h2><%= current_user.email %></h2>
   <%= link_to 'Compose a message', new_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
-  <%= link_to 'Check for new messages', refresh_emails_url, :class => 'ui-btn ui-btn-inline ui-corner-all always-reload' %>
 
-  <div id="all_emails">
+  <div id="inbox">
   </div>
-
-  <div id="inbox" data-role="collapsible">
-    <h3>Inbox (<%= @emails[:inbox].size %>)</h3>
-    <table data-role="table" data-mode="reflow" id="inbox-table" class="emails-list ui-responsive">
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>From</th>
-        <th>Subject</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @emails[:inbox].each do |email| %>
-          <tr>
-            <td><%= email.friendly_date %></td>
-            <td><%= email.from %></td>
-            <td><%= link_to email.subject, email %></td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
+  <div id="sent">
   </div>
-
-  <div id="sent" data-role="collapsible">
-    <h3>Sent (<%= @emails[:sent].size %>)</h3>
-    <table data-role="table" data-mode="reflow" id="sent-table" class="emails-list ui-responsive">
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>To</th>
-        <th>Subject</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @emails[:sent].each do |email| %>
-          <tr>
-            <td><%= email.friendly_date %></td>
-            <td><%= email.to %></td>
-            <td><%= link_to email.subject, email %></td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
+  <div id="archived">
   </div>
-
-  <div id="archived" data-role="collapsible">
-    <h3>Archived (<%= @emails[:archived].size %>)</h3>
-    <table data-role="table" data-mode="reflow" id="archived-table" class="emails-list ui-responsive">
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>From</th>
-        <th>Subject</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @emails[:archived].each do |email| %>
-          <tr>
-            <td><%= email.friendly_date %></td>
-            <td><%= email.from %></td>
-            <td><%= link_to email.subject, email %></td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
-  </div>
-
-  <div id="unknown" data-role="collapsible">
-    <h3>Unknown (<%= @emails[:unknown].size %>)</h3>
-
-    <p style="color: red">Messages from unknown senders will be removed after one week</p>
-    <table data-role="table" data-mode="reflow" id="unknowns-table" class="emails-list ui-responsive">
-      <thead>
-      <tr>
-        <th data-priority="1">Date</th>
-        <th>From</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @emails[:unknown].each do |email| %>
-          <tr>
-            <td><%= email.friendly_date %></td>
-            <td><%= email.from %></td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
+  <div id="unknown">
   </div>
 </div>
 
-<script type="text/template" id="emails-template">
+<script type="text/template" id="inbox-template">
   <div data-role="collapsible">
-    <h3>All Emails (<%%= emails.length %>)</h3>
-    <table data-role="table" data-mode="reflow" id="inbox-table" class="emails-list ui-responsive">
+    <h3>Inbox (<%%= emails.length %>)</h3>
+    <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
       <thead>
       <tr>
         <th>Date</th>
-        <th>To</th>
         <th>From</th>
         <th>Subject</th>
       </tr>
@@ -117,12 +29,11 @@
       <tbody>
       <%% _.each(emails, function(email) { %>
       <%% var id = email.get('id');
-      if (id > last_email_id) {
-      last_email_id = id;
+      if (id > last_inbox_id) {
+      last_inbox_id = id;
       } %>
       <tr>
         <td><%%= email.get('friendly_date') %></td>
-        <td><%%= email.get('to') %></td>
         <td><%%= email.get('from') %></td>
         <td><%%= email.get('subject') %></td>
       </tr>
@@ -132,14 +43,105 @@
   </div>
 </script>
 
+<script type="text/template" id="sent-template">
+  <div data-role="collapsible">
+    <h3>Sent (<%%= emails.length %>)</h3>
+    <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>To</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% var id = email.get('id');
+      if (id > last_sent_id) {
+      last_sent_id = id;
+      } %>
+      <tr>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('to') %></td>
+        <td><%%= email.get('subject') %></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+</script>
+
+<script type="text/template" id="archived-template">
+  <div data-role="collapsible">
+    <h3>Archived (<%%= emails.length %>)</h3>
+    <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% var id = email.get('id');
+      if (id > last_archived_id) {
+      last_archived_id = id;
+      } %>
+      <tr>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('from') %></td>
+        <td><%%= email.get('subject') %></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+</script>
+
+<script type="text/template" id="unknown-template">
+  <div data-role="collapsible">
+    <h3>From Unknown Senders (<%%= emails.length %>)</h3>
+    <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% var id = email.get('id');
+      if (id > last_unknown_id) {
+      last_unknown_id = id;
+      } %>
+      <tr>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('from') %></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+</script>
+
 <script>
 
-    var last_email_id = 0;
+    var last_inbox_id = 0;
+    var last_sent_id = 0;
+    var last_archived_id = 0;
+    var last_unknown_id = 0;
 
-    var Emails = Backbone.Collection.extend({
+    var EmailCollection = Backbone.Collection.extend({
         url: '/emails'
     });
-    var emails = new Emails();
+    var inboxEmails = new EmailCollection();
+    var sentEmails = new EmailCollection();
+    var archivedEmails = new EmailCollection();
+    var unknownEmails = new EmailCollection();
 
     var onFailure = function () {
         $("#warnings").text("Unable to connect to the server");
@@ -148,34 +150,113 @@
         $("#warnings").text("");
     };
 
-    var EmailsView = Backbone.View.extend({
-        el: '#all_emails',
+    var InboxView = Backbone.View.extend({
+        el: '#inbox',
         render: function () {
             var that = this;
-            emails.fetch({
+            inboxEmails.fetch({
                 add: true,
-                data: {last_id: last_email_id},
+                data: {
+                    last_id: last_inbox_id,
+                    mailbox_type: 'inbox'
+                },
                 success: function (emails) {
                     onSuccess();
-                    var template = _.template($('#emails-template').html(), {emails: emails.models});
+                    var template = _.template($('#inbox-template').html(), {
+                        emails: emails.models
+                    });
                     that.$el.html(template);
                     that.$el.enhanceWithin();
-                },
-                error: onFailure()
+                }
             })
         }
     });
 
-    var emailsView = new EmailsView();
-    emailsView.render();
+    var SentView = Backbone.View.extend({
+        el: '#sent',
+        render: function () {
+            var that = this;
+            sentEmails.fetch({
+                add: true,
+                data: {
+                    last_id: last_sent_id,
+                    mailbox_type: 'sent'
+                },
+                success: function (emails) {
+                    onSuccess();
+                    var template = _.template($('#sent-template').html(), {
+                        emails: emails.models
+                    });
+                    that.$el.html(template);
+                    that.$el.enhanceWithin();
+                }
+            })
+        }
+    });
+
+    var ArchivedView = Backbone.View.extend({
+        el: '#archived',
+        render: function () {
+            var that = this;
+            archivedEmails.fetch({
+                add: true,
+                data: {
+                    last_id: last_archived_id,
+                    mailbox_type: 'archived'
+                },
+                success: function (emails) {
+                    onSuccess();
+                    var template = _.template($('#archived-template').html(), {
+                        emails: emails.models
+                    });
+                    that.$el.html(template);
+                    that.$el.enhanceWithin();
+                }
+            })
+        }
+    });
+
+    var UnknownView = Backbone.View.extend({
+        el: '#unknown',
+        render: function () {
+            var that = this;
+            unknownEmails.fetch({
+                add: true,
+                data: {
+                    last_id: last_unknown_id,
+                    mailbox_type: 'unknown'
+                },
+                success: function (emails) {
+                    onSuccess();
+                    var template = _.template($('#unknown-template').html(), {
+                        emails: emails.models
+                    });
+                    that.$el.html(template);
+                    that.$el.enhanceWithin();
+                }
+            })
+        }
+    });
+
+    var inboxView = new InboxView();
+    var sentView = new SentView();
+    var archivedView = new ArchivedView();
+    var unknownView = new UnknownView();
 
     (function () {
         $.get("/emails/refresh");
+        inboxView.render();
+        sentView.render();
+        archivedView.render();
+        unknownView.render();
         setInterval(function () {
             $.get("/emails/refresh").fail(onFailure()).success(onSuccess());
         }, 60000);
         setInterval(function () {
-            emailsView.render();
+            inboxView.render();
+            sentView.render();
+            archivedView.render();
+            unknownView.render();
         }, 15000);
     }());
 

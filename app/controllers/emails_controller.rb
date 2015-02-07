@@ -8,46 +8,33 @@ class EmailsController < ApplicationController
 
   respond_to :html, :json
 
-  class EmailLite
-    attr_accessor :id, :subject, :to, :from, :friendly_date
-  end
-
   def index
     last_id = params[:last_id] || 0
-    emails = Email.select(:id, :to, :from, :subject, :date, :friendly_date)
-                 .where(:user_id => current_user.id).where("id > #{last_id}")
-                 .where("\"from\" in (:friends) or \"to\" in (:friends)", friends: current_user.friends.select(:email))
-                 .order(date: :desc)
-    #friends = current_user.friends.collect { |friend| friend.email }
-    inbox = []
-    archived = []
-    unknown = []
-    sent = []
-    lite_emails = []
-=begin
-    my_emails.each do |email|
-      lite_email = EmailLite.new
-      lite_email.subject = email.subject
-      lite_email.to = email.to
-      lite_email.from = email.from
-      lite_email.friendly_date = email.friendly_date
-      lite_emails << lite_email
-      if email.sent
-        sent << email
-      else
-        if email.from.in? friends
-          if email.archived
-            archived << email
-          else
-            inbox << email
-          end
-        else
-          unknown << email
-        end
-      end
+    case params[:mailbox_type]
+      when 'sent'
+        emails = Email.select(:id, :to, :subject, :date, :friendly_date)
+                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where(sent: true)
+                     .order(date: :desc)
+      when 'archived'
+        emails = Email.select(:id, :from, :subject, :date, :friendly_date)
+                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where("\"from\" in (?)", current_user.friends.select(:email))
+                     .where(archived: true)
+                     .order(date: :desc)
+      when 'unknown'
+        emails = Email.select(:id, :from, :subject, :date, :friendly_date)
+                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where("\"from\" not in (?)", current_user.friends.select(:email))
+                     .order(date: :desc)
+      else # inbox
+        emails = Email.select(:id, :from, :subject, :date, :friendly_date)
+                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where("\"from\" in (?)", current_user.friends.select(:email))
+                     .where(archived: false)
+                     .where(sent: false)
+                     .order(date: :desc)
     end
-=end
-    @emails = {:inbox => inbox, :archived => archived, :unknown => unknown, :sent => sent}
     respond_with(emails)
   end
 
@@ -128,9 +115,9 @@ class EmailsController < ApplicationController
   end
 
   def refresh
-    users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
-    PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
-    #PopJob.perform_later(current_user.id)
+    #users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
+    #PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
+    PopJob.perform_later(current_user.id)
     render nothing: true
   end
 
