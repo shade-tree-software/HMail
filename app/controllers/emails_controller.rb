@@ -9,27 +9,26 @@ class EmailsController < ApplicationController
   respond_to :html, :json
 
   def index
-    last_id = params[:last_id] || 0
     case params[:mailbox_type]
       when 'sent'
         emails = Email.select(:id, :to, :subject, :date, :friendly_date)
-                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where(user_id: current_user.id)
                      .where(sent: true)
                      .order(date: :desc)
       when 'archived'
         emails = Email.select(:id, :from, :subject, :date, :friendly_date)
-                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where(user_id: current_user.id)
                      .where("\"from\" in (?)", current_user.friends.select(:email))
                      .where(archived: true)
                      .order(date: :desc)
       when 'unknown'
         emails = Email.select(:id, :from, :subject, :date, :friendly_date)
-                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where(user_id: current_user.id)
                      .where("\"from\" not in (?)", current_user.friends.select(:email))
                      .order(date: :desc)
       else # inbox
         emails = Email.select(:id, :from, :subject, :date, :friendly_date)
-                     .where(user_id: current_user.id).where("id > #{last_id}")
+                     .where(user_id: current_user.id)
                      .where("\"from\" in (?)", current_user.friends.select(:email))
                      .where(archived: false)
                      .where(sent: false)
