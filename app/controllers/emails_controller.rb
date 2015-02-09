@@ -110,13 +110,14 @@ class EmailsController < ApplicationController
 
   def archive
     @email.update(:archived => true)
-    redirect_to :action => :index
+    flash[:notice] = "Message has been archived"
+    render :action => :show
   end
 
   def refresh
-    users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
-    PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
-    #PopJob.perform_later(current_user.id)
+    #users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
+    #PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
+    PopJob.perform_later(current_user.id)
     render nothing: true
   end
 

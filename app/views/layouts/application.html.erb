@@ -1,49 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js" lang="en">
 <head>
   <title>Hamilton Mail</title>
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+  <meta charset="utf-8"/>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/css/foundation.css"/>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css"/>
+
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-  <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.5.0/js/foundation.min.js"></script>
 </head>
 
 <body>
-<div data-role="page">
-  <div data-role="header">
-    <h1>Hamilton Mail</h1>
-    <% if user_signed_in? %>
-        <% if notice %>
-            <p style="color:green" class="alert alert-success"><%= notice %></p>
-        <% end %>
-        <% if alert %>
-            <p style="color:red" class="alert alert-danger"><%= alert %></p>
-        <% end %>
-        <% unless params[:controller] == 'emails' && params[:action] == 'index' %>
-            <%= link_to "Home", '/', :class => 'ui-btn ui-icon-home ui-btn-icon-notext' %>
-            <%= link_to "Back", :back, :class => 'ui-btn ui-icon-back ui-btn-icon-notext' %>
-        <% end %>
-    <% end %>
-  </div>
 
-  <%= yield %>
+<script>
+    // turn off any polling timers
+    if (typeof timer1 != 'undefined') {
+        clearInterval(timer1);
+    }
+    if (typeof timer2 != 'undefined') {
+        clearInterval(timer2);
+    }
 
-  <div data-role="footer">
+</script>
+<div class="fixed">
+  <nav class="top-bar" data-topbar role="navigation">
     <% if user_signed_in? %>
-        <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
-            <%= link_to "Approved Friends", friends_path %>
-            <%= link_to "New User", new_registration_path(:user) %>
-        <% end %>
-        <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+        <ul id="main-buttons" class="button-group left">
+          <% unless params[:controller] == 'emails' && params[:action] == 'index' %>
+              <li><%= link_to "Home", '/', :class => 'button' %></li>
+              <li><%= link_to "Back", :back, :class => 'button' %></li>
+          <% end %>
+          <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
+              <li><%= link_to "Approved Friends", friends_path, :class => 'button' %></li>
+              <li><%= link_to "New User", new_registration_path(:user), :class => 'button' %></li>
+          <% end %>
+        </ul>
+        <ul class="right">
+          <li><%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'button' %></li>
+        </ul>
     <% end %>
-  </div>
+  </nav>
 </div>
+<br><br><br>
+
+<div class="row">
+  <% if user_signed_in? %>
+      <% if notice %>
+          <p style="color:green" class="alert alert-success"><%= notice %></p>
+      <% end %>
+      <% if alert %>
+          <p style="color:red" class="alert alert-danger"><%= alert %></p>
+      <% end %>
+  <% end %>
+</div>
+
+<%= yield %>
+
 </body>
 </html>

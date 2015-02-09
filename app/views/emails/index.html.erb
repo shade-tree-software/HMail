@@ -1,42 +1,45 @@
 <div role="main" class="ui-content">
-  <span style="color:red" id="warnings"></span>
+  <span class="row" style="color:red" id="warnings"></span>
 
-  <h2><%= current_user.email %></h2>
-  <%= link_to 'Compose a message', new_email_path, {:class => 'ui-btn ui-btn-inline ui-corner-all'} %>
+  <p class="row">Logged in as <%= current_user.email %><p>
 
-  <div data-role="collapsible">
-    <h3 id="inbox-title">Inbox</h3>
-
-    <div id="inbox">
+  <div class="row">
+    <div class="small-9 columns">
+      <ul class="tabs" data-tab>
+        <li class="tab-title active"><a id="inbox-title" href="#panel1">Inbox</a></li>
+        <li class="tab-title"><a id="sent-title" href="#panel2">Sent</a></li>
+        <li class="tab-title"><a id="archived-title" href="#panel3">Archived</a></li>
+        <li class="tab-title"><a id="unknown-title" href="#panel4">Blacklisted</a></li>
+      </ul>
+    </div>
+    <div class="small-3 columns">
+      <%= link_to 'Compose a message', new_email_path, {:class => 'medium round button'} %>
     </div>
   </div>
 
-
-  <div data-role="collapsible">
-    <h3 id="sent-title">Sent</h3>
-
-    <div id="sent">
+  <div class="tabs-content row">
+    <div class="content active" id="panel1">
+      <div id="inbox">
+      </div>
     </div>
-  </div>
-
-  <div data-role="collapsible">
-    <h3 id="archived-title">Archived</h3>
-
-    <div id="archived">
+    <div class="content" id="panel2">
+      <div id="sent">
+      </div>
     </div>
-  </div>
-
-  <div data-role="collapsible">
-    <h3 id="unknown-title">Blacklisted</h3>
-
-    <div id="unknown">
+    <div class="content" id="panel3">
+      <div id="archived">
+      </div>
+    </div>
+    <div class="content" id="panel4">
+      <div id="unknown">
+      </div>
     </div>
   </div>
 
 </div>
 
 <script type="text/template" id="inbox-template">
-  <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+  <table>
     <thead>
     <tr>
       <th>Date</th>
@@ -62,7 +65,7 @@
 </script>
 
 <script type="text/template" id="sent-template">
-  <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+  <table>
     <thead>
     <tr>
       <th>Date</th>
@@ -88,7 +91,7 @@
 </script>
 
 <script type="text/template" id="archived-template">
-  <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+  <table>
     <thead>
     <tr>
       <th>Date</th>
@@ -114,7 +117,7 @@
 </script>
 
 <script type="text/template" id="unknown-template">
-  <table data-role="table" data-mode="reflow" class="emails-list ui-responsive">
+  <table>
     <thead>
     <tr>
       <th>Date</th>
@@ -138,12 +141,10 @@
 </script>
 
 <script>
-    (function () {
 
-        var last_inbox_id = 0;
-        var last_sent_id = 0;
-        var last_archived_id = 0;
-        var last_unknown_id = 0;
+    var timer1, timer2;
+
+    (function () {
 
         var EmailCollection = Backbone.Collection.extend({
             url: '/emails'
@@ -161,8 +162,9 @@
             $("#warnings").text("");
         };
 
-        var updateEmailCount = function (selectorText, mailboxType, emailCount){
-            var elem = $(selectorText).find("a").first();
+        var updateEmailCount = function (selectorText, mailboxType, emailCount) {
+            var elem;
+            elem = $(selectorText); //.find("a").first();
             var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
             var newTitle = elem.html().replace(regex, mailboxType + " (" + emailCount + ")");
             elem.html(newTitle);
@@ -184,7 +186,7 @@
                         });
                         updateEmailCount("#inbox-title", "Inbox", emails.models.length);
                         that.$el.html(template);
-                        that.$el.enhanceWithin();
+                        $(document).foundation('tab', 'reflow');
                     }
                 })
             }
@@ -206,7 +208,7 @@
                         });
                         updateEmailCount("#sent-title", "Sent", emails.models.length);
                         that.$el.html(template);
-                        that.$el.enhanceWithin();
+                        $(document).foundation('tab', 'reflow');
                     }
                 })
             }
@@ -228,7 +230,7 @@
                         });
                         updateEmailCount("#archived-title", "Archived", emails.models.length);
                         that.$el.html(template);
-                        that.$el.enhanceWithin();
+                        $(document).foundation('tab', 'reflow');
                     }
                 })
             }
@@ -250,7 +252,7 @@
                         });
                         updateEmailCount("#unknown-title", "Blacklisted", emails.models.length);
                         that.$el.html(template);
-                        that.$el.enhanceWithin();
+                        $(document).foundation('tab', 'reflow');
                     }
                 })
             }
@@ -266,15 +268,17 @@
         sentView.render();
         archivedView.render();
         unknownView.render();
-        setInterval(function () {
+        timer1 = setInterval(function () {
             $.get("/emails/refresh").fail(onFailure()).success(onSuccess());
         }, 60000);
-        setInterval(function () {
+        timer2 = setInterval(function () {
             inboxView.render();
             sentView.render();
             archivedView.render();
             unknownView.render();
         }, 15000);
+
+        $(document).foundation();
     }());
 
 </script>

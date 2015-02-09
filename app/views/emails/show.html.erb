@@ -6,17 +6,25 @@
     });
 </script>
 
-<div role="main" class="ui-content">
-  <% unless @email.archived || @email.sent %>
-      <%= link_to 'Archive', archive_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
-      <%= link_to 'Reply', reply_email_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
-  <% end %>
+<div class="row">
+  <ul class="button-group round">
+    <% unless @email.sent %>
+        <li><%= link_to 'Reply', reply_email_path, :class => 'button' %></li>
+        <% unless @email.archived %>
+            <li><%= link_to 'Archive', archive_email_path, {:class => 'button'} %></li>
+        <% end %>
+    <% end %>
+  </ul>
+</div>
 
+<div class="row">
   <p>
     <strong>Date:</strong>
     <%= @email.friendly_date %>
   </p>
+</div>
 
+<div class="row">
   <p>
     <% if @email.sent %>
         <strong>To:</strong>
@@ -26,15 +34,19 @@
         <%= @email.from %>
     <% end %>
   </p>
+</div>
 
+<div class="row">
   <p>
     <strong>Subject:</strong>
     <%= @email.subject %>
   </p>
-
-  <p id="email_text">
-    <%= @email.text(:show_warnings => true) %>
-  </p>
-
 </div>
+
+<div class="row">
+  <p id="email_text">
+    <%= raw @email.text(:show_warnings => true) %>
+  </p>
+</div>
+
 

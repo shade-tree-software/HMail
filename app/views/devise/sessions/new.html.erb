@@ -1,28 +1,28 @@
-
-
 <div role="main" class="ui-content">
-  <h2>Please Log in</h2>
+  <div class="row">
+    <h1>Please Log In</h1>
+  </div>
 
   <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-      <div class="field">
+      <div class="field row">
         <%= f.label :email %>
         <%= f.email_field :email, autofocus: true %>
       </div>
 
-      <div class="field">
+      <div class="field row">
         <%= f.label :password %>
         <%= f.password_field :password, autocomplete: "off" %>
       </div>
 
       <% if devise_mapping.rememberable? -%>
-          <div class="field">
+          <div class="field row">
             <%= f.check_box :remember_me %>
             <%= f.label :remember_me %>
           </div>
       <% end -%>
 
-      <div class="actions">
-        <%= f.submit "Log in", 'data-inline' => :true %>
+      <div class="actions row">
+        <%= f.submit "Log in", :class => 'medium round button' %>
       </div>
   <% end %>
 
