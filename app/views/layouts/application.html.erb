@@ -56,10 +56,14 @@
 <div class="row">
   <% if user_signed_in? %>
       <% if notice %>
-          <p style="color:green" class="alert alert-success"><%= notice %></p>
+          <div data-alert class="alert-box success">
+            <%= notice %>
+          </div>
       <% end %>
       <% if alert %>
-          <p style="color:red" class="alert alert-danger"><%= alert %></p>
+          <div data-alert class="alert-box alert">
+            <%= alert %>
+          </div>
       <% end %>
   <% end %>
 </div>

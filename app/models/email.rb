@@ -5,6 +5,37 @@ class Email < ActiveRecord::Base
 
   attr_accessor :message
 
+  def self.sync_mailbox(user, mailbox_type)
+    case mailbox_type
+      when 'sent'
+        Email.select(:id, :to, :subject, :date, :friendly_date)
+            .where(user_id: user.id)
+            .where(sent: true)
+            .order(date: :desc)
+      when 'archived'
+        Email.select(:id, :from, :subject, :date, :friendly_date)
+            .where(user_id: user.id)
+            .where("\"from\" in (?)", user.friends.select(:email))
+            .where(archived: true)
+            .order(date: :desc)
+      when 'unknown'
+        Email.where(user_id: user.id)
+            .where("\"from\" not in (?)", user.friends.select(:email))
+            .where("date < #{Time.now.to_i - 604800}").delete_all
+        Email.select(:id, :from, :subject, :date, :friendly_date)
+            .where(user_id: user.id)
+            .where("\"from\" not in (?)", user.friends.select(:email))
+            .order(date: :desc)
+      else # inbox
+        Email.select(:id, :from, :subject, :date, :friendly_date)
+            .where(user_id: user.id)
+            .where("\"from\" in (?)", user.friends.select(:email))
+            .where(archived: false)
+            .where(sent: false)
+            .order(date: :desc)
+    end
+  end
+
   def text(args = {})
     if self.body.nil?
       ''
@@ -40,7 +71,7 @@ class Email < ActiveRecord::Base
     reply_text = preamble + original_lines.join("\n")
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
-    {recipients: friends, subject: new_subject, reply_text: reply_text, is_reply: true }
+    {recipients: friends, subject: new_subject, reply_text: reply_text, is_reply: true}
   end
 
 end

@@ -1,44 +1,43 @@
-<div role="main" class="ui-content">
-  <span class="row" style="color:red" id="warnings"></span>
-
-  <p class="row">Logged in as <%= current_user.email %><p>
-
-  <div class="row">
-    <div class="small-9 columns">
-      <ul class="tabs" data-tab>
-        <li class="tab-title active"><a id="inbox-title" href="#panel1">Inbox</a></li>
-        <li class="tab-title"><a id="sent-title" href="#panel2">Sent</a></li>
-        <li class="tab-title"><a id="archived-title" href="#panel3">Archived</a></li>
-        <li class="tab-title"><a id="unknown-title" href="#panel4">Blacklisted</a></li>
-      </ul>
-    </div>
-    <div class="small-3 columns">
-      <%= link_to 'Compose a message', new_email_path, {:class => 'medium round button'} %>
-    </div>
-  </div>
-
-  <div class="tabs-content row">
-    <div class="content active" id="panel1">
-      <div id="inbox">
-      </div>
-    </div>
-    <div class="content" id="panel2">
-      <div id="sent">
-      </div>
-    </div>
-    <div class="content" id="panel3">
-      <div id="archived">
-      </div>
-    </div>
-    <div class="content" id="panel4">
-      <div id="unknown">
-      </div>
-    </div>
-  </div>
-
+<div class="row">
+  <p>Logged in as <%= current_user.email %></p>
 </div>
 
+<div class="row">
+  <div class="small-9 columns">
+    <ul class="tabs" data-tab>
+      <li class="tab-title active"><a id="inbox-title" href="#panel1">Inbox</a></li>
+      <li class="tab-title"><a id="sent-title" href="#panel2">Sent</a></li>
+      <li class="tab-title"><a id="archived-title" href="#panel3">Archived</a></li>
+      <li class="tab-title"><a id="unknown-title" href="#panel4">Blacklisted</a></li>
+    </ul>
+  </div>
+  <div class="small-3 columns">
+    <%= link_to 'Compose a message', new_email_path, {:class => 'medium round button'} %>
+  </div>
+</div>
+
+<div class="tabs-content row">
+  <div class="content active" id="panel1">
+    <div id="inbox">
+    </div>
+  </div>
+  <div class="content" id="panel2">
+    <div id="sent">
+    </div>
+  </div>
+  <div class="content" id="panel3">
+    <div id="archived">
+    </div>
+  </div>
+  <div class="content" id="panel4">
+    <div id="unknown">
+    </div>
+  </div>
+</div>
+
+
 <script type="text/template" id="inbox-template">
+  <%% if (emails.length > 0) { %>
   <table>
     <thead>
     <tr>
@@ -62,9 +61,11 @@
     <%% }); %>
     </tbody>
   </table>
+  <%% } %>
 </script>
 
 <script type="text/template" id="sent-template">
+  <%% if (emails.length > 0) { %>
   <table>
     <thead>
     <tr>
@@ -88,9 +89,11 @@
     <%% }); %>
     </tbody>
   </table>
+  <%% } %>
 </script>
 
 <script type="text/template" id="archived-template">
+  <%% if (emails.length > 0) { %>
   <table>
     <thead>
     <tr>
@@ -114,10 +117,15 @@
     <%% }); %>
     </tbody>
   </table>
+  <%% } %>
 </script>
 
 <script type="text/template" id="unknown-template">
+  <%% if (emails.length > 0) { %>
   <table>
+    <div data-alert class="alert-box alert">
+      Blacklisted emails will be deleted after one week
+    </div>
     <thead>
     <tr>
       <th>Date</th>
@@ -138,6 +146,7 @@
     <%% }); %>
     </tbody>
   </table>
+  <%% } %>
 </script>
 
 <script>
@@ -156,10 +165,8 @@
         var unknownEmails = new EmailCollection();
 
         var onFailure = function () {
-            $("#warnings").text("Unable to connect to the server");
         };
         var onSuccess = function () {
-            $("#warnings").text("");
         };
 
         var updateEmailCount = function (selectorText, mailboxType, emailCount) {
