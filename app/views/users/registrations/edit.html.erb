@@ -30,6 +30,16 @@
         <%= f.password_field :current_password, autocomplete: "off" %>
       </div>
 
+      <div class="field">
+        <%= f.label :email_pw %>
+        <%= f.password_field :email_pw, autocomplete: "off" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :email_pw_confirmation %>
+        <%= f.password_field :email_pw_confirmation, autocomplete: "off" %>
+      </div>
+
       <div class="actions">
         <%= f.submit "Update", 'data-inline' => :true %>
       </div>

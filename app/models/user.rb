@@ -17,4 +17,6 @@ class User < ActiveRecord::Base
   has_many :emails
   has_many :userfriends
   has_many :friends, :through => :userfriends
+
+  attr_encrypted :email_pw, :key => ENV['ENCRYPTION_KEY']
 end
