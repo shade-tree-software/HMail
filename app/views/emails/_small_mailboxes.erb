@@ -1,0 +1,63 @@
+<div class="off-canvas-wrap" data-offcanvas>
+  <div class="inner-wrap">
+      <nav class="tab-bar">
+        <section class="left-small">
+          <a class="left-off-canvas-toggle menu-icon" href="#"><span></span></a>
+        </section>
+
+        <section class="middle tab-bar-section">
+          <div id="off-canvas-menu-title" class="title"></div>
+        </section>
+
+        <section class="right">
+          <button href="#" data-dropdown="drop1" aria-controls="drop1" aria-expanded="false" class="button tiny dropdown">
+            <span>Menu</span>
+          </button>
+          <ul id="drop1" data-dropdown-content class="f-dropdown" aria-hidden="true" tabindex="-1">
+            <li><%= link_to 'Compose a message', new_email_path %></li>
+            <li><%= link_to "Logout", destroy_user_session_path, method: :delete %></li>
+          </ul>
+        </section>
+
+      </nav>
+
+    <div class="left-off-canvas-menu">
+      <ul class="off-canvas-list" data-tab>
+        <li><label class="first">Mailboxes</label></li>
+        <li class="tab-title active"><a id="inbox-title" href="#panel1">Inbox</a></li>
+        <li class="tab-title"><a id="sent-title" href="#panel2">Sent</a></li>
+        <li class="tab-title"><a id="archived-title" href="#panel3">Archived</a></li>
+        <li class="tab-title"><a id="blacklisted-title" href="#panel4">Blacklisted</a></li>
+        <li></li>
+      </ul>
+    </div>
+
+    <section class="main-section">
+      <br>
+
+      <div class="tabs-content row">
+
+
+        <div class="content active" id="panel1">
+          <div id="small-inbox">
+          </div>
+        </div>
+        <div class="content" id="panel2">
+          <div id="small-sent">
+          </div>
+        </div>
+        <div class="content" id="panel3">
+          <div id="small-archived">
+          </div>
+        </div>
+        <div class="content" id="panel4">
+          <div id="small-blacklisted">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <a class="exit-off-canvas"></a>
+
+  </div>
+</div>

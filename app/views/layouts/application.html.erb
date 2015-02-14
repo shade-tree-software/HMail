@@ -32,43 +32,21 @@
     }
 
 </script>
-<div class="fixed">
-  <nav class="top-bar" data-topbar role="navigation">
-    <% if user_signed_in? %>
-        <ul id="main-buttons" class="button-group left">
-          <% unless params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to "Home", '/', :class => 'button' %></li>
-              <li><%= link_to "Back", :back, :class => 'button' %></li>
-          <% end %>
-          <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to "Approved Friends", friends_path, :class => 'button' %></li>
-              <li><%= link_to "New User", new_registration_path(:user), :class => 'button' %></li>
-          <% end %>
-        </ul>
-        <ul class="right">
-          <li><%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'button' %></li>
-        </ul>
-    <% end %>
-  </nav>
-</div>
-<br><br><br>
 
-<div class="row">
-  <% if user_signed_in? %>
-      <% if notice %>
-          <div data-alert class="alert-box success">
-            <%= notice %>
-          </div>
-      <% end %>
-      <% if alert %>
-          <div data-alert class="alert-box alert">
-            <%= alert %>
-          </div>
-      <% end %>
-  <% end %>
-</div>
 
 <%= yield %>
 
+<% if user_signed_in? %>
+    <% if notice %>
+        <div data-alert class="alert-box success">
+          <%= notice %>
+        </div>
+    <% end %>
+    <% if alert %>
+        <div data-alert class="alert-box alert">
+          <%= alert %>
+        </div>
+    <% end %>
+<% end %>
 </body>
 </html>
