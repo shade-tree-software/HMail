@@ -29,6 +29,7 @@ class PopJob < ActiveJob::Base
         args[:sent] = args[:from] == user_name
         args[:date] = email.date.to_i
         args[:friendly_date] = email.date.to_time.localtime.ctime
+        args[:unread] = true
         Email.create(args)
       end
     end

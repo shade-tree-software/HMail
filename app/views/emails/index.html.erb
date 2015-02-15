@@ -32,7 +32,11 @@
 
     <tbody>
     <%% _.each(emails, function(email) { %>
+    <%% if (email.get('unread')) { %>
+    <tr style="font-weight:bold">
+      <%% } else { %>
     <tr>
+      <%% } %>
       <td><%%= email.get('friendly_date') %></td>
       <td><%%= email.get('from') %></td>
       <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
@@ -148,7 +152,11 @@
 
     <tbody>
     <%% _.each(emails, function(email) { %>
+    <%% if (email.get('unread')) { %>
+    <tr style="font-weight:bold">
+      <%% } else { %>
     <tr>
+      <%% } %>
       <td><%%= email.get('friendly_date') %></td>
       <td><%%= email.get('from') %></td>
     </tr>
@@ -177,11 +185,24 @@
         var onSuccess = function () {
         };
 
-        var updateEmailCount = function (selectorText, mailboxType, emailCount) {
+        var updateEmailCount = function (selectorText, mailboxType, emails) {
+            var unreadCount = 0;
+            _.each(emails, function (email) {
+                if (email.get('unread')) {
+                    unreadCount++;
+                }
+            });
             var $elem = $(selectorText);
             var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
             $elem.each(function (index, elem) {
-                var newTitle = $(elem).html().replace(regex, mailboxType + " (" + emailCount + ")");
+                var newTitle;
+                if (unreadCount > 0){
+                    newTitle = $(elem).html().replace(regex, mailboxType + " (" + unreadCount + ")");
+                    $(elem).css('font-weight', 'bold');
+                } else {
+                    newTitle = mailboxType;
+                    $(elem).css('font-weight', 'normal');
+                }
                 $(elem).html(newTitle);
             });
         };
@@ -193,7 +214,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#inbox-title-small", "Inbox", emails.models.length);
+                updateEmailCount("#inbox-title-small", "Inbox", emails.models);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -206,7 +227,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#inbox-title-regular", "Inbox", emails.models.length);
+                updateEmailCount("#inbox-title-regular", "Inbox", emails.models);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -219,7 +240,6 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#sent-title-small", "Sent", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -232,7 +252,6 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#sent-title-regular", "Sent", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -245,7 +264,6 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#archived-title-small", "Archived", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -258,7 +276,6 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#archived-title-regular", "Archived", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -271,7 +288,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#blacklisted-title-small", "Blacklisted", emails.models.length);
+                updateEmailCount("#blacklisted-title-small", "Blacklisted", emails.models);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -284,7 +301,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#blacklisted-title-regular", "Blacklisted", emails.models.length);
+                updateEmailCount("#blacklisted-title-regular", "Blacklisted", emails.models);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }

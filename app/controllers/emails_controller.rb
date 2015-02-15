@@ -14,6 +14,8 @@ class EmailsController < ApplicationController
   end
 
   def show
+    @email.unread = false
+    @email.save
     respond_with(@email)
   end
 
