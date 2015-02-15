@@ -10,14 +10,14 @@
     <div class="large-8 columns">
       <div data-alert class="alert-box info">
         <%% if (emails.length > 0) { %>
-        Inbox
+        Inbox for <%= current_user.email %>
         <%% } else { %>
         Inbox is empty
         <%% } %>
       </div>
     </div>
     <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
     </div>
   </div>
   <%% if (emails.length > 0) { %>
@@ -55,7 +55,7 @@
       </div>
     </div>
     <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
     </div>
   </div>
   <%% if (emails.length > 0) { %>
@@ -93,7 +93,7 @@
       </div>
     </div>
     <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
     </div>
   </div>
   <%% if (emails.length > 0) { %>
@@ -131,7 +131,7 @@
       </div>
     </div>
     <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
     </div>
   </div>
   <%% if (emails.length > 0) { %>
