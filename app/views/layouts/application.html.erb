@@ -30,23 +30,18 @@
     if (typeof timer2 != 'undefined') {
         clearInterval(timer2);
     }
-
 </script>
 
 
-<%= yield %>
-
 <% if user_signed_in? %>
-    <% if notice %>
-        <div data-alert class="alert-box success">
-          <%= notice %>
-        </div>
-    <% end %>
     <% if alert %>
         <div data-alert class="alert-box alert">
           <%= alert %>
         </div>
     <% end %>
 <% end %>
+
+<%= yield %>
+
 </body>
 </html>

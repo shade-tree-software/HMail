@@ -1,7 +1,7 @@
-
+<%= render 'layouts/top_bar' %>
 
 <div class="row">
-  <h2><%= @params[:is_reply] ? 'Reply' : 'New Email' %></h2>
+  <h1><%= @params[:is_reply] ? 'Reply' : 'New Email' %></h1>
 </div>
 
 <%= render 'form' %>

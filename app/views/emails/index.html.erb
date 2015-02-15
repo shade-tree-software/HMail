@@ -1,11 +1,25 @@
-<div class="show-for-large-up">
-  <%= render 'regular_mailboxes' %>
-</div>
 <div class="show-for-medium-down">
   <%= render 'small_mailboxes' %>
 </div>
+<div class="show-for-large-up">
+  <%= render 'regular_mailboxes' %>
+</div>
 
 <script type="text/template" id="inbox-template">
+  <div class="row">
+    <div class="large-8 columns">
+      <div data-alert class="alert-box info">
+        <%% if (emails.length > 0) { %>
+        Inbox
+        <%% } else { %>
+        Inbox is empty
+        <%% } %>
+      </div>
+    </div>
+    <div class="large-4 columns show-for-large-up">
+      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+    </div>
+  </div>
   <%% if (emails.length > 0) { %>
   <table>
     <thead>
@@ -26,14 +40,24 @@
     <%% }); %>
     </tbody>
   </table>
-  <%% } else { %>
-  <div data-alert class="alert-box info">
-    There are no messages in the inbox right now
-  </div>
   <%% } %>
 </script>
 
 <script type="text/template" id="sent-template">
+  <div class="row">
+    <div class="large-8 columns">
+      <div data-alert class="alert-box info">
+        <%% if (emails.length > 0) { %>
+        Sent Messages
+        <%% } else { %>
+        There are no sent messages
+        <%% } %>
+      </div>
+    </div>
+    <div class="large-4 columns show-for-large-up">
+      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+    </div>
+  </div>
   <%% if (emails.length > 0) { %>
   <table>
     <thead>
@@ -54,14 +78,24 @@
     <%% }); %>
     </tbody>
   </table>
-  <%% } else { %>
-  <div data-alert class="alert-box info">
-    There are no sent messages right now
-  </div>
   <%% } %>
 </script>
 
 <script type="text/template" id="archived-template">
+  <div class="row">
+    <div class="large-8 columns">
+      <div data-alert class="alert-box info">
+        <%% if (emails.length > 0) { %>
+        Archived Messages
+        <%% } else { %>
+        There are no archived messages
+        <%% } %>
+      </div>
+    </div>
+    <div class="large-4 columns show-for-large-up">
+      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+    </div>
+  </div>
   <%% if (emails.length > 0) { %>
   <table>
     <thead>
@@ -82,17 +116,27 @@
     <%% }); %>
     </tbody>
   </table>
-  <%% } else { %>
-  <div data-alert class="alert-box info">
-    There are no archived messages right now
-  </div>
   <%% } %>
 </script>
 
 <script type="text/template" id="blacklisted-template">
+  <div class="row">
+    <div class="large-8 columns">
+      <div data-alert class="alert-box info">
+        <%% if (emails.length > 0) { %>
+        Blacklisted Messages
+        <%% } else { %>
+        There are no blacklisted messages
+        <%% } %>
+      </div>
+    </div>
+    <div class="large-4 columns show-for-large-up">
+      <%= link_to 'Compose a message', new_email_path, :class => 'small round button' %>
+    </div>
+  </div>
   <%% if (emails.length > 0) { %>
   <div data-alert class="alert-box alert">
-    Blacklisted messages will be deleted after one week
+    These messages will be deleted after one week
   </div>
   <table>
     <thead>
@@ -111,16 +155,10 @@
     <%% }); %>
     </tbody>
   </table>
-  <%% } else { %>
-  <div data-alert class="alert-box info">
-    There are no blacklisted messages right now
-  </div>
   <%% } %>
-
 </script>
 
 <script>
-
     var timer1, timer2;
 
     (function () {
@@ -140,11 +178,12 @@
         };
 
         var updateEmailCount = function (selectorText, mailboxType, emailCount) {
-            var elem;
-            elem = $(selectorText); //.find("a").first();
+            var $elem = $(selectorText);
             var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
-            var newTitle = elem.html().replace(regex, mailboxType + " (" + emailCount + ")");
-            elem.html(newTitle);
+            $elem.each(function (index, elem) {
+                var newTitle = $(elem).html().replace(regex, mailboxType + " (" + emailCount + ")");
+                $(elem).html(newTitle);
+            });
         };
 
         var SmallInboxView = Backbone.View.extend({
@@ -154,7 +193,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#inbox-title", "Inbox", emails.models.length);
+                updateEmailCount("#inbox-title-small", "Inbox", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -167,7 +206,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#inbox-title", "Inbox", emails.models.length);
+                updateEmailCount("#inbox-title-regular", "Inbox", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -180,7 +219,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#sent-title", "Sent", emails.models.length);
+                updateEmailCount("#sent-title-small", "Sent", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -193,7 +232,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#sent-title", "Sent", emails.models.length);
+                updateEmailCount("#sent-title-regular", "Sent", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -206,7 +245,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#archived-title", "Archived", emails.models.length);
+                updateEmailCount("#archived-title-small", "Archived", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -219,7 +258,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#archived-title", "Archived", emails.models.length);
+                updateEmailCount("#archived-title-regular", "Archived", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -232,7 +271,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#blacklisted-title", "Blacklisted", emails.models.length);
+                updateEmailCount("#blacklisted-title-small", "Blacklisted", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
@@ -245,7 +284,7 @@
                     that: this,
                     emails: emails.models
                 });
-                updateEmailCount("#blacklisted-title", "Blacklisted", emails.models.length);
+                updateEmailCount("#blacklisted-title-regular", "Blacklisted", emails.models.length);
                 this.$el.html(template);
                 $(document).foundation('tab', 'reflow');
             }
