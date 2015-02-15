@@ -1,0 +1,10 @@
+.tabs.vertical.small {
+    float: left;
+    margin: 0 0 1.25rem;
+    max-width: 100%;
+    width: 90%;
+}
+.tabs.vertical.regular {
+    max-width: 100%;
+    width: 100%;
+}
