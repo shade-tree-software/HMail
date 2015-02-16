@@ -21,29 +21,52 @@
     </div>
   </div>
   <%% if (emails.length > 0) { %>
-  <table>
-    <thead>
-    <tr>
-      <th>Date</th>
-      <th>From</th>
-      <th>Subject</th>
-    </tr>
-    </thead>
+  <div class="show-for-small">
+    <table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% if (email.get('unread')) { %>
+      <tr style="font-weight:bold">
+        <%% } else { %>
+      <tr>
+        <%% } %>
+        <td>
+          <ul class="list-style: none">
+            <li>Date: <%%= email.get('friendly_date') %></li>
+            <li>From: <%%= email.get('from') %></li>
+            <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
+          </ul>
+        </td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+  <div class="show-for-medium-up">
+    <table>
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
 
-    <tbody>
-    <%% _.each(emails, function(email) { %>
-    <%% if (email.get('unread')) { %>
-    <tr style="font-weight:bold">
-      <%% } else { %>
-    <tr>
-      <%% } %>
-      <td><%%= email.get('friendly_date') %></td>
-      <td><%%= email.get('from') %></td>
-      <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
-    </tr>
-    <%% }); %>
-    </tbody>
-  </table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% if (email.get('unread')) { %>
+      <tr style="font-weight:bold">
+        <%% } else { %>
+      <tr>
+        <%% } %>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('from') %></td>
+        <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
   <%% } %>
 </script>
 
@@ -63,25 +86,44 @@
     </div>
   </div>
   <%% if (emails.length > 0) { %>
-  <table>
-    <thead>
-    <tr>
-      <th>Date</th>
-      <th>To</th>
-      <th>Subject</th>
-    </tr>
-    </thead>
+  <div class="show-for-small">
+    <table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <tr>
+        <td>
+          <ul class="list-style: none">
+            <li>Date: <%%= email.get('friendly_date') %></li>
+            <li>To: <%%= email.get('to') %></li>
+            <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
+          </ul>
+        </td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+  <div class="show-for-medium-up">
+    <table>
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>To</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
 
-    <tbody>
-    <%% _.each(emails, function(email) { %>
-    <tr>
-      <td><%%= email.get('friendly_date') %></td>
-      <td><%%= email.get('to') %></td>
-      <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
-    </tr>
-    <%% }); %>
-    </tbody>
-  </table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <tr>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('to') %></td>
+        <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
   <%% } %>
 </script>
 
@@ -101,25 +143,44 @@
     </div>
   </div>
   <%% if (emails.length > 0) { %>
-  <table>
-    <thead>
-    <tr>
-      <th>Date</th>
-      <th>From</th>
-      <th>Subject</th>
-    </tr>
-    </thead>
+  <div class="show-for-small">
+    <table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <tr>
+        <td>
+          <ul class="list-style: none">
+            <li>Date: <%%= email.get('friendly_date') %></li>
+            <li>From: <%%= email.get('from') %></li>
+            <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
+          </ul>
+        </td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+  <div class="show-for-medium-up">
+    <table>
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+        <th>Subject</th>
+      </tr>
+      </thead>
 
-    <tbody>
-    <%% _.each(emails, function(email) { %>
-    <tr>
-      <td><%%= email.get('friendly_date') %></td>
-      <td><%%= email.get('from') %></td>
-      <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
-    </tr>
-    <%% }); %>
-    </tbody>
-  </table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <tr>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('from') %></td>
+        <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
   <%% } %>
 </script>
 
@@ -142,27 +203,49 @@
   <div data-alert class="alert-box alert">
     These messages will be deleted after one week
   </div>
-  <table>
-    <thead>
-    <tr>
-      <th>Date</th>
-      <th>From</th>
-    </tr>
-    </thead>
+  <div class="show-for-small">
+    <table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% if (email.get('unread')) { %>
+      <tr style="font-weight:bold">
+        <%% } else { %>
+      <tr>
+        <%% } %>
+        <td>
+          <ul class="list-style: none">
+            <li>Date: <%%= email.get('friendly_date') %></li>
+            <li>From: <%%= email.get('from') %></li>
+          </ul>
+        </td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
+  <div class="show-for-medium-up">
+    <table>
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>From</th>
+      </tr>
+      </thead>
 
-    <tbody>
-    <%% _.each(emails, function(email) { %>
-    <%% if (email.get('unread')) { %>
-    <tr style="font-weight:bold">
-      <%% } else { %>
-    <tr>
-      <%% } %>
-      <td><%%= email.get('friendly_date') %></td>
-      <td><%%= email.get('from') %></td>
-    </tr>
-    <%% }); %>
-    </tbody>
-  </table>
+      <tbody>
+      <%% _.each(emails, function(email) { %>
+      <%% if (email.get('unread')) { %>
+      <tr style="font-weight:bold">
+        <%% } else { %>
+      <tr>
+        <%% } %>
+        <td><%%= email.get('friendly_date') %></td>
+        <td><%%= email.get('from') %></td>
+      </tr>
+      <%% }); %>
+      </tbody>
+    </table>
+  </div>
   <%% } %>
 </script>
 
@@ -196,7 +279,7 @@
             var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
             $elem.each(function (index, elem) {
                 var newTitle;
-                if (unreadCount > 0){
+                if (unreadCount > 0) {
                     newTitle = $(elem).html().replace(regex, mailboxType + " (" + unreadCount + ")");
                     $(elem).css('font-weight', 'bold');
                 } else {
