@@ -13,7 +13,7 @@
   </ul>
 
   <section class="top-bar-section">
-    <ul class="right show-for-medium-up button-group">
+    <ul class="right show-for-medium-up">
       <% if user_signed_in? %>
           <% if params[:controller] == 'emails' && params[:action] == 'index' %>
               <li><%= link_to 'Compose New Message', new_email_path, :class => 'button show-for-medium-down' %></li>
