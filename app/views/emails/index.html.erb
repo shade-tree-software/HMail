@@ -32,7 +32,8 @@
         <%% } %>
         <td>
           <ul class="list-style: none">
-            <li>Date: <%%= email.get('friendly_date') %></li>
+            <%% var date = new Date(email.get('date') * 1000) %>
+            <li>Date: <%%= date.toLocaleString() %></li>
             <li>From: <%%= email.get('from') %></li>
             <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
           </ul>
@@ -59,7 +60,8 @@
         <%% } else { %>
       <tr>
         <%% } %>
-        <td><%%= email.get('friendly_date') %></td>
+        <%% var date = new Date(email.get('date') * 1000) %>
+        <td><%%= date.toLocaleString() %></td>
         <td><%%= email.get('from') %></td>
         <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
       </tr>
@@ -93,7 +95,8 @@
       <tr>
         <td>
           <ul class="list-style: none">
-            <li>Date: <%%= email.get('friendly_date') %></li>
+            <%% var date = new Date(email.get('date') * 1000) %>
+            <li>Date: <%%= date.toLocaleString() %></li>
             <li>To: <%%= email.get('to') %></li>
             <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
           </ul>
@@ -116,7 +119,8 @@
       <tbody>
       <%% _.each(emails, function(email) { %>
       <tr>
-        <td><%%= email.get('friendly_date') %></td>
+        <%% var date = new Date(email.get('date') * 1000) %>
+        <td><%%= date.toLocaleString() %></td>
         <td><%%= email.get('to') %></td>
         <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
       </tr>
@@ -150,7 +154,8 @@
       <tr>
         <td>
           <ul class="list-style: none">
-            <li>Date: <%%= email.get('friendly_date') %></li>
+            <%% var date = new Date(email.get('date') * 1000) %>
+            <li>Date: <%%= date.toLocaleString() %></li>
             <li>From: <%%= email.get('from') %></li>
             <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
           </ul>
@@ -173,7 +178,8 @@
       <tbody>
       <%% _.each(emails, function(email) { %>
       <tr>
-        <td><%%= email.get('friendly_date') %></td>
+        <%% var date = new Date(email.get('date') * 1000) %>
+        <td><%%= date.toLocaleString() %></td>
         <td><%%= email.get('from') %></td>
         <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
       </tr>
@@ -214,7 +220,8 @@
         <%% } %>
         <td>
           <ul class="list-style: none">
-            <li>Date: <%%= email.get('friendly_date') %></li>
+            <%% var date = new Date(email.get('date') * 1000) %>
+            <li>Date: <%%= date.toLocaleString() %></li>
             <li>From: <%%= email.get('from') %></li>
           </ul>
         </td>
@@ -239,7 +246,8 @@
         <%% } else { %>
       <tr>
         <%% } %>
-        <td><%%= email.get('friendly_date') %></td>
+        <%% var date = new Date(email.get('date') * 1000) %>
+        <td><%%= date.toLocaleString() %></td>
         <td><%%= email.get('from') %></td>
       </tr>
       <%% }); %>

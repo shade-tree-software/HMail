@@ -3,9 +3,11 @@
 
 <script>
     $(document).ready(function () {
-        email_text_elem = $('#email_text');
-        email_text_elem.html(email_text_elem.text().replace(/\n\r?/g, '<br />'));
-        console.log(email_text_elem.text());
+        var $email_text_elem = $('#email_text');
+        $email_text_elem.html($email_text_elem.text().replace(/\n\r?/g, '<br />'));
+        var $date_elem = $('#date');
+        var date = new Date(parseInt($date_elem.text()) * 1000);
+        $date_elem.text(date.toLocaleString());
     });
 </script>
 
@@ -23,7 +25,7 @@
 <div class="row">
   <p>
     <strong>Date:</strong>
-    <%= @email.friendly_date %>
+    <span id="date"><%= @email.date %></span>
   </p>
 </div>
 

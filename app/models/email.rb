@@ -8,12 +8,12 @@ class Email < ActiveRecord::Base
   def self.sync_mailbox(user, mailbox_type)
     case mailbox_type
       when 'sent'
-        Email.select(:id, :to, :subject, :date, :friendly_date)
+        Email.select(:id, :to, :subject, :date)
             .where(user_id: user.id)
             .where(sent: true)
             .order(date: :desc)
       when 'archived'
-        Email.select(:id, :from, :subject, :date, :friendly_date)
+        Email.select(:id, :from, :subject, :date)
             .where(user_id: user.id)
             .where("\"from\" in (?)", user.friends.select(:email))
             .where(archived: true)
@@ -22,12 +22,12 @@ class Email < ActiveRecord::Base
         Email.where(user_id: user.id)
             .where("\"from\" not in (?)", user.friends.select(:email))
             .where("date < #{Time.now.to_i - 604800}").delete_all
-        Email.select(:id, :from, :subject, :date, :friendly_date, :unread)
+        Email.select(:id, :from, :subject, :date, :unread)
             .where(user_id: user.id)
             .where("\"from\" not in (?)", user.friends.select(:email))
             .order(date: :desc)
       else # inbox
-        Email.select(:id, :from, :subject, :date, :friendly_date, :unread)
+        Email.select(:id, :from, :subject, :date, :unread)
             .where(user_id: user.id)
             .where("\"from\" in (?)", user.friends.select(:email))
             .where(archived: false)
@@ -57,7 +57,6 @@ class Email < ActiveRecord::Base
           end
         end
       end.join("\n")
-      #body_text = body_text.gsub(/>\s*/, '>').gsub(/\s*</, '<') if mail.content_type.start_with? 'text/html'
     end
   end
 
@@ -67,7 +66,7 @@ class Email < ActiveRecord::Base
     original_lines = text.split("\n").collect do |line|
       "> #{line}"
     end
-    preamble = original_lines.empty? ? '' : "\n\nOn #{friendly_date} #{from} wrote: \n"
+    preamble = original_lines.empty? ? '' : "\n\nOn #{Time.at(date).utc.to_s} #{from} wrote: \n"
     reply_text = preamble + original_lines.join("\n")
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject

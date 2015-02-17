@@ -33,7 +33,6 @@ class PopJob < ActiveJob::Base
             new_email.body = mail.to_s
             new_email.archived = false
             new_email.sent = mail.from.first == user_name
-            new_email.friendly_date = mail.date.to_time.localtime.ctime
             new_email.unread = true
           end
         rescue ActiveRecord::RecordNotUnique

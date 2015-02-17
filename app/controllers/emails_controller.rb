@@ -70,8 +70,7 @@ class EmailsController < ApplicationController
                        :to => recipient,
                        :from => sender,
                        :subject => subj,
-                       :date => mail.date.to_i,
-                       :friendly_date => mail.date.to_time.localtime.ctime)
+                       :date => mail.date.to_i)
     @email.save
     respond_with(@email)
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150216234725) do
+ActiveRecord::Schema.define(version: 20150217021354) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,15 +19,14 @@ ActiveRecord::Schema.define(version: 20150216234725) do
   create_table "emails", force: :cascade do |t|
     t.string   "body"
     t.integer  "user_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean  "archived"
     t.boolean  "sent"
     t.string   "subject"
     t.string   "to"
     t.string   "from"
     t.integer  "date"
-    t.string   "friendly_date"
     t.boolean  "unread"
   end
 
