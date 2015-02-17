@@ -18,7 +18,7 @@ class Email < ActiveRecord::Base
             .where("\"from\" in (?)", user.friends.select(:email))
             .where(archived: true)
             .order(date: :desc)
-      when 'blacklisted'
+      when 'unapproved'
         Email.where(user_id: user.id)
             .where("\"from\" not in (?)", user.friends.select(:email))
             .where("date < #{Time.now.to_i - 604800}").delete_all

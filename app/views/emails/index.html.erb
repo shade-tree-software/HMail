@@ -192,14 +192,14 @@
     <%% } %>
   </script>
 
-  <script type="text/template" id="blacklisted-template">
+  <script type="text/template" id="unapproved-template">
     <div class="row">
       <div class="large-8 columns">
         <div data-alert class="alert-box info">
           <%% if (emails.length > 0) { %>
-          Blacklisted Messages
+          Unapproved Messages
           <%% } else { %>
-          There are no blacklisted messages
+          There are no unapproved messages
           <%% } %>
         </div>
       </div>
@@ -277,7 +277,7 @@
           var inboxEmails = new EmailCollection();
           var sentEmails = new EmailCollection();
           var archivedEmails = new EmailCollection();
-          var blacklistedEmails = new EmailCollection();
+          var unapprovedEmails = new EmailCollection();
 
           var lastConnectTime = new Date(0);
 
@@ -379,21 +379,21 @@
               }
           });
 
-          var BlacklistedView = Backbone.View.extend({
-              el: '.blacklisted',
+          var UnapprovedView = Backbone.View.extend({
+              el: '.unapproved',
               render: function () {
                   var that = this;
-                  blacklistedEmails.fetch({
+                  unapprovedEmails.fetch({
                       data: {
-                          mailbox_type: 'blacklisted'
+                          mailbox_type: 'unapproved'
                       },
                       success: function (emails) {
                           onSuccess();
-                          var template = _.template($('#blacklisted-template').html(), {
+                          var template = _.template($('#unapproved-template').html(), {
                               that: this,
                               emails: emails.models
                           });
-                          updateEmailCount(".blacklisted-title", "Blacklisted", emails.models);
+                          updateEmailCount(".unapproved-title", "Unapproved", emails.models);
                           that.$el.html(template);
                           $(document).foundation('tab', 'reflow');
                       },
@@ -405,7 +405,7 @@
           var inboxView = new InboxView();
           var sentView = new SentView();
           var archivedView = new ArchivedView();
-          var blacklistedView = new BlacklistedView();
+          var unapprovedView = new UnapprovedView();
 
           var pop = function () {
               $.get("/emails/refresh").fail(onFailure).success(onSuccess);
@@ -418,7 +418,7 @@
               inboxView.render();
               sentView.render();
               archivedView.render();
-              blacklistedView.render();
+              unapprovedView.render();
           };
 
           pop();
