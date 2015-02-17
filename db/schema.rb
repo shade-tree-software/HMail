@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150215222211) do
+ActiveRecord::Schema.define(version: 20150216234725) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(version: 20150215222211) do
     t.string   "friendly_date"
     t.boolean  "unread"
   end
+
+  add_index "emails", ["user_id", "subject", "to", "from", "date"], name: "emails_user_id_subject_to_from_date_key", unique: true, using: :btree
 
   create_table "friends", force: :cascade do |t|
     t.string   "first_name"
