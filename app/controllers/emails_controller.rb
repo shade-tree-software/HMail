@@ -61,7 +61,7 @@ class EmailsController < ApplicationController
       body msg
     end
 
-    mail.deliver!
+    mail.deliver! unless current_user.email == 'none@nowhere.com'
 
     @email = Email.new(:body => mail.to_s,
                        :user_id => current_user.id,
@@ -80,10 +80,10 @@ class EmailsController < ApplicationController
   #  respond_with(@email)
   #end
 
-  #def destroy
-  #  @email.destroy
-  #  respond_with(@email)
-  #end
+  def destroy
+    @email.destroy
+    respond_with(@email)
+  end
 
   def archive
     @email.update(:archived => true)

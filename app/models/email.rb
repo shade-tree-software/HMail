@@ -25,6 +25,7 @@ class Email < ActiveRecord::Base
         Email.select(:id, :from, :subject, :date, :unread)
             .where(user_id: user.id)
             .where("\"from\" not in (?)", user.friends.select(:email))
+            .where(sent: false)
             .order(date: :desc)
       else # inbox
         Email.select(:id, :from, :subject, :date, :unread)

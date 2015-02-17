@@ -1,481 +1,488 @@
-<div class="show-for-medium-down">
-  <%= render 'small_mailboxes' %>
+<div data-no-turbolink>
+  <div class="show-for-medium-down">
+    <%= render 'small_mailboxes' %>
+  </div>
+  <div class="show-for-large-up">
+    <%= render 'regular_mailboxes' %>
+  </div>
+
+  <script type="text/template" id="inbox-template">
+    <div class="row">
+      <div class="large-8 columns">
+        <div data-alert class="alert-box info">
+          <%% if (emails.length > 0) { %>
+          Inbox for <%= current_user.email %>
+          <%% } else { %>
+          Inbox is empty
+          <%% } %>
+        </div>
+      </div>
+      <div class="large-4 columns show-for-large-up">
+        <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
+      </div>
+    </div>
+    <%% if (emails.length > 0) { %>
+    <div class="show-for-small">
+      <table>
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <%% if (email.get('unread')) { %>
+        <tr style="font-weight:bold">
+          <%% } else { %>
+        <tr>
+          <%% } %>
+          <td>
+            <ul class="list-style: none">
+              <%% var date = new Date(email.get('date') * 1000) %>
+              <li>Date: <%%= date.toLocaleString() %></li>
+              <li>From: <%%= email.get('from') %></li>
+              <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
+            </ul>
+          </td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="show-for-medium-up">
+      <table>
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>From</th>
+          <th>Subject</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <%% if (email.get('unread')) { %>
+        <tr style="font-weight:bold">
+          <%% } else { %>
+        <tr>
+          <%% } %>
+          <%% var date = new Date(email.get('date') * 1000) %>
+          <td><%%= date.toLocaleString() %></td>
+          <td><%%= email.get('from') %></td>
+          <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <%% } %>
+  </script>
+
+  <script type="text/template" id="sent-template">
+    <div class="row">
+      <div class="large-8 columns">
+        <div data-alert class="alert-box info">
+          <%% if (emails.length > 0) { %>
+          Sent Messages
+          <%% } else { %>
+          There are no sent messages
+          <%% } %>
+        </div>
+      </div>
+      <div class="large-4 columns show-for-large-up">
+        <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
+      </div>
+    </div>
+    <%% if (emails.length > 0) { %>
+    <div class="show-for-small">
+      <table>
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <tr>
+          <td>
+            <ul class="list-style: none">
+              <%% var date = new Date(email.get('date') * 1000) %>
+              <li>Date: <%%= date.toLocaleString() %></li>
+              <li>To: <%%= email.get('to') %></li>
+              <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
+            </ul>
+          </td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="show-for-medium-up">
+      <table>
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>To</th>
+          <th>Subject</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <tr>
+          <%% var date = new Date(email.get('date') * 1000) %>
+          <td><%%= date.toLocaleString() %></td>
+          <td><%%= email.get('to') %></td>
+          <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <%% } %>
+  </script>
+
+  <script type="text/template" id="archived-template">
+    <div class="row">
+      <div class="large-8 columns">
+        <div data-alert class="alert-box info">
+          <%% if (emails.length > 0) { %>
+          Archived Messages
+          <%% } else { %>
+          There are no archived messages
+          <%% } %>
+        </div>
+      </div>
+      <div class="large-4 columns show-for-large-up">
+        <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
+      </div>
+    </div>
+    <%% if (emails.length > 0) { %>
+    <div class="show-for-small">
+      <table>
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <tr>
+          <td>
+            <ul class="list-style: none">
+              <%% var date = new Date(email.get('date') * 1000) %>
+              <li>Date: <%%= date.toLocaleString() %></li>
+              <li>From: <%%= email.get('from') %></li>
+              <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
+            </ul>
+          </td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="show-for-medium-up">
+      <table>
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>From</th>
+          <th>Subject</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <tr>
+          <%% var date = new Date(email.get('date') * 1000) %>
+          <td><%%= date.toLocaleString() %></td>
+          <td><%%= email.get('from') %></td>
+          <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <%% } %>
+  </script>
+
+  <script type="text/template" id="blacklisted-template">
+    <div class="row">
+      <div class="large-8 columns">
+        <div data-alert class="alert-box info">
+          <%% if (emails.length > 0) { %>
+          Blacklisted Messages
+          <%% } else { %>
+          There are no blacklisted messages
+          <%% } %>
+        </div>
+      </div>
+      <div class="large-4 columns show-for-large-up">
+        <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
+      </div>
+    </div>
+    <%% if (emails.length > 0) { %>
+    <div data-alert class="alert-box alert">
+      These messages will be deleted after one week
+    </div>
+    <div class="show-for-small">
+      <table>
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <%% if (email.get('unread')) { %>
+        <tr style="font-weight:bold">
+          <%% } else { %>
+        <tr>
+          <%% } %>
+          <td>
+            <ul class="list-style: none">
+              <%% var date = new Date(email.get('date') * 1000) %>
+              <li>Date: <%%= date.toLocaleString() %></li>
+              <li>From: <%%= email.get('from') %></li>
+              <li>
+                <a href="/emails/<%%=email.get('id')%>" data-method="delete" data-confirm="Are you sure you want to delete this message?" class="tiny round button">Delete</a>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="show-for-medium-up">
+      <table>
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>From</th>
+          <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <%% _.each(emails, function(email) { %>
+        <%% if (email.get('unread')) { %>
+        <tr style="font-weight:bold">
+          <%% } else { %>
+        <tr>
+          <%% } %>
+          <%% var date = new Date(email.get('date') * 1000) %>
+          <td><%%= date.toLocaleString() %></td>
+          <td><%%= email.get('from') %></td>
+          <td>
+            <a href="/emails/<%%=email.get('id')%>" data-method="delete" data-confirm="Are you sure you want to delete this message?" class="tiny round button">Delete</a>
+          </td>
+        </tr>
+        <%% }); %>
+        </tbody>
+      </table>
+    </div>
+    <%% } %>
+  </script>
+
+  <script>
+      (function () {
+
+          var EmailCollection = Backbone.Collection.extend({
+              url: '/emails'
+          });
+
+          var inboxEmails = new EmailCollection();
+          var sentEmails = new EmailCollection();
+          var archivedEmails = new EmailCollection();
+          var blacklistedEmails = new EmailCollection();
+
+          var onFailure = function () {
+          };
+          var onSuccess = function () {
+          };
+
+          var updateEmailCount = function (selectorText, mailboxType, emails) {
+              var unreadCount = 0;
+              _.each(emails, function (email) {
+                  if (email.get('unread')) {
+                      unreadCount++;
+                  }
+              });
+              var $elem = $(selectorText);
+              var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
+              $elem.each(function (index, elem) {
+                  var newTitle;
+                  if (unreadCount > 0) {
+                      newTitle = $(elem).html().replace(regex, mailboxType + " (" + unreadCount + ")");
+                      $(elem).css('font-weight', 'bold');
+                  } else {
+                      newTitle = mailboxType;
+                      $(elem).css('font-weight', 'normal');
+                  }
+                  $(elem).html(newTitle);
+              });
+          };
+
+          var SmallInboxView = Backbone.View.extend({
+              el: '#small-inbox',
+              render: function (emails) {
+                  var template = _.template($('#inbox-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  updateEmailCount("#inbox-title-small", "Inbox", emails.models);
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var RegularInboxView = Backbone.View.extend({
+              el: '#regular-inbox',
+              render: function (emails) {
+                  var template = _.template($('#inbox-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  updateEmailCount("#inbox-title-regular", "Inbox", emails.models);
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var SmallSentView = Backbone.View.extend({
+              el: '#small-sent',
+              render: function (emails) {
+                  var template = _.template($('#sent-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var RegularSentView = Backbone.View.extend({
+              el: '#regular-sent',
+              render: function (emails) {
+                  var template = _.template($('#sent-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var SmallArchivedView = Backbone.View.extend({
+              el: '#small-archived',
+              render: function (emails) {
+                  var template = _.template($('#archived-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var RegularArchivedView = Backbone.View.extend({
+              el: '#regular-archived',
+              render: function (emails) {
+                  var template = _.template($('#archived-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var SmallBlacklistedView = Backbone.View.extend({
+              el: '#small-blacklisted',
+              render: function (emails) {
+                  var template = _.template($('#blacklisted-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  updateEmailCount("#blacklisted-title-small", "Blacklisted", emails.models);
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var RegularBlacklistedView = Backbone.View.extend({
+              el: '#regular-blacklisted',
+              render: function (emails) {
+                  var template = _.template($('#blacklisted-template').html(), {
+                      that: this,
+                      emails: emails.models
+                  });
+                  updateEmailCount("#blacklisted-title-regular", "Blacklisted", emails.models);
+                  this.$el.html(template);
+                  $(document).foundation('tab', 'reflow');
+              }
+          });
+
+          var smallInboxView = new SmallInboxView();
+          var regularInboxView = new RegularInboxView();
+          var smallSentView = new SmallSentView();
+          var regularSentView = new RegularSentView();
+          var smallArchivedView = new SmallArchivedView();
+          var regularArchivedView = new RegularArchivedView();
+          var smallBlacklistedView = new SmallBlacklistedView();
+          var regularBlacklistedView = new RegularBlacklistedView();
+
+          $.get("/emails/refresh");
+
+          var updateInbox = function () {
+              inboxEmails.fetch({
+                  data: {
+                      mailbox_type: 'inbox'
+                  },
+                  success: function (emails) {
+                      onSuccess();
+                      smallInboxView.render(emails);
+                      regularInboxView.render(emails);
+                  }
+              });
+          };
+
+          var updateSent = function () {
+              sentEmails.fetch({
+                  data: {
+                      mailbox_type: 'sent'
+                  },
+                  success: function (emails) {
+                      onSuccess();
+                      smallSentView.render(emails);
+                      regularSentView.render(emails);
+                  }
+              });
+          };
+
+          var updateArchived = function () {
+              archivedEmails.fetch({
+                  data: {
+                      mailbox_type: 'archived'
+                  },
+                  success: function (emails) {
+                      onSuccess();
+                      smallArchivedView.render(emails);
+                      regularArchivedView.render(emails);
+                  }
+              });
+          };
+
+          var updateBlacklisted = function () {
+              blacklistedEmails.fetch({
+                  data: {
+                      mailbox_type: 'blacklisted'
+                  },
+                  success: function (emails) {
+                      onSuccess();
+                      smallBlacklistedView.render(emails);
+                      regularBlacklistedView.render(emails);
+                  }
+              });
+          };
+
+          updateInbox();
+          updateSent();
+          updateArchived();
+          updateBlacklisted();
+          setInterval(function () {
+              $.get("/emails/refresh").fail(onFailure()).success(onSuccess());
+          }, 60000);
+          setInterval(function () {
+              updateInbox();
+              updateSent();
+              updateArchived();
+              updateBlacklisted();
+          }, 15000);
+
+          $(document).foundation();
+      }());
+
+  </script>
 </div>
-<div class="show-for-large-up">
-  <%= render 'regular_mailboxes' %>
-</div>
-
-<script type="text/template" id="inbox-template">
-  <div class="row">
-    <div class="large-8 columns">
-      <div data-alert class="alert-box info">
-        <%% if (emails.length > 0) { %>
-        Inbox for <%= current_user.email %>
-        <%% } else { %>
-        Inbox is empty
-        <%% } %>
-      </div>
-    </div>
-    <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
-    </div>
-  </div>
-  <%% if (emails.length > 0) { %>
-  <div class="show-for-small">
-    <table>
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <%% if (email.get('unread')) { %>
-      <tr style="font-weight:bold">
-        <%% } else { %>
-      <tr>
-        <%% } %>
-        <td>
-          <ul class="list-style: none">
-            <%% var date = new Date(email.get('date') * 1000) %>
-            <li>Date: <%%= date.toLocaleString() %></li>
-            <li>From: <%%= email.get('from') %></li>
-            <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
-          </ul>
-        </td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <div class="show-for-medium-up">
-    <table>
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>From</th>
-        <th>Subject</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <%% if (email.get('unread')) { %>
-      <tr style="font-weight:bold">
-        <%% } else { %>
-      <tr>
-        <%% } %>
-        <%% var date = new Date(email.get('date') * 1000) %>
-        <td><%%= date.toLocaleString() %></td>
-        <td><%%= email.get('from') %></td>
-        <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <%% } %>
-</script>
-
-<script type="text/template" id="sent-template">
-  <div class="row">
-    <div class="large-8 columns">
-      <div data-alert class="alert-box info">
-        <%% if (emails.length > 0) { %>
-        Sent Messages
-        <%% } else { %>
-        There are no sent messages
-        <%% } %>
-      </div>
-    </div>
-    <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
-    </div>
-  </div>
-  <%% if (emails.length > 0) { %>
-  <div class="show-for-small">
-    <table>
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <tr>
-        <td>
-          <ul class="list-style: none">
-            <%% var date = new Date(email.get('date') * 1000) %>
-            <li>Date: <%%= date.toLocaleString() %></li>
-            <li>To: <%%= email.get('to') %></li>
-            <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
-          </ul>
-        </td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <div class="show-for-medium-up">
-    <table>
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>To</th>
-        <th>Subject</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <tr>
-        <%% var date = new Date(email.get('date') * 1000) %>
-        <td><%%= date.toLocaleString() %></td>
-        <td><%%= email.get('to') %></td>
-        <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <%% } %>
-</script>
-
-<script type="text/template" id="archived-template">
-  <div class="row">
-    <div class="large-8 columns">
-      <div data-alert class="alert-box info">
-        <%% if (emails.length > 0) { %>
-        Archived Messages
-        <%% } else { %>
-        There are no archived messages
-        <%% } %>
-      </div>
-    </div>
-    <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
-    </div>
-  </div>
-  <%% if (emails.length > 0) { %>
-  <div class="show-for-small">
-    <table>
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <tr>
-        <td>
-          <ul class="list-style: none">
-            <%% var date = new Date(email.get('date') * 1000) %>
-            <li>Date: <%%= date.toLocaleString() %></li>
-            <li>From: <%%= email.get('from') %></li>
-            <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
-          </ul>
-        </td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <div class="show-for-medium-up">
-    <table>
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>From</th>
-        <th>Subject</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <tr>
-        <%% var date = new Date(email.get('date') * 1000) %>
-        <td><%%= date.toLocaleString() %></td>
-        <td><%%= email.get('from') %></td>
-        <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <%% } %>
-</script>
-
-<script type="text/template" id="blacklisted-template">
-  <div class="row">
-    <div class="large-8 columns">
-      <div data-alert class="alert-box info">
-        <%% if (emails.length > 0) { %>
-        Blacklisted Messages
-        <%% } else { %>
-        There are no blacklisted messages
-        <%% } %>
-      </div>
-    </div>
-    <div class="large-4 columns show-for-large-up">
-      <%= link_to 'Compose New Message', new_email_path, :class => 'small round button' %>
-    </div>
-  </div>
-  <%% if (emails.length > 0) { %>
-  <div data-alert class="alert-box alert">
-    These messages will be deleted after one week
-  </div>
-  <div class="show-for-small">
-    <table>
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <%% if (email.get('unread')) { %>
-      <tr style="font-weight:bold">
-        <%% } else { %>
-      <tr>
-        <%% } %>
-        <td>
-          <ul class="list-style: none">
-            <%% var date = new Date(email.get('date') * 1000) %>
-            <li>Date: <%%= date.toLocaleString() %></li>
-            <li>From: <%%= email.get('from') %></li>
-          </ul>
-        </td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <div class="show-for-medium-up">
-    <table>
-      <thead>
-      <tr>
-        <th>Date</th>
-        <th>From</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <%% _.each(emails, function(email) { %>
-      <%% if (email.get('unread')) { %>
-      <tr style="font-weight:bold">
-        <%% } else { %>
-      <tr>
-        <%% } %>
-        <%% var date = new Date(email.get('date') * 1000) %>
-        <td><%%= date.toLocaleString() %></td>
-        <td><%%= email.get('from') %></td>
-      </tr>
-      <%% }); %>
-      </tbody>
-    </table>
-  </div>
-  <%% } %>
-</script>
-
-<script>
-    var timer1, timer2;
-
-    (function () {
-
-        var EmailCollection = Backbone.Collection.extend({
-            url: '/emails'
-        });
-
-        var inboxEmails = new EmailCollection();
-        var sentEmails = new EmailCollection();
-        var archivedEmails = new EmailCollection();
-        var blacklistedEmails = new EmailCollection();
-
-        var onFailure = function () {
-        };
-        var onSuccess = function () {
-        };
-
-        var updateEmailCount = function (selectorText, mailboxType, emails) {
-            var unreadCount = 0;
-            _.each(emails, function (email) {
-                if (email.get('unread')) {
-                    unreadCount++;
-                }
-            });
-            var $elem = $(selectorText);
-            var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
-            $elem.each(function (index, elem) {
-                var newTitle;
-                if (unreadCount > 0) {
-                    newTitle = $(elem).html().replace(regex, mailboxType + " (" + unreadCount + ")");
-                    $(elem).css('font-weight', 'bold');
-                } else {
-                    newTitle = mailboxType;
-                    $(elem).css('font-weight', 'normal');
-                }
-                $(elem).html(newTitle);
-            });
-        };
-
-        var SmallInboxView = Backbone.View.extend({
-            el: '#small-inbox',
-            render: function (emails) {
-                var template = _.template($('#inbox-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                updateEmailCount("#inbox-title-small", "Inbox", emails.models);
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var RegularInboxView = Backbone.View.extend({
-            el: '#regular-inbox',
-            render: function (emails) {
-                var template = _.template($('#inbox-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                updateEmailCount("#inbox-title-regular", "Inbox", emails.models);
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var SmallSentView = Backbone.View.extend({
-            el: '#small-sent',
-            render: function (emails) {
-                var template = _.template($('#sent-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var RegularSentView = Backbone.View.extend({
-            el: '#regular-sent',
-            render: function (emails) {
-                var template = _.template($('#sent-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var SmallArchivedView = Backbone.View.extend({
-            el: '#small-archived',
-            render: function (emails) {
-                var template = _.template($('#archived-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var RegularArchivedView = Backbone.View.extend({
-            el: '#regular-archived',
-            render: function (emails) {
-                var template = _.template($('#archived-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var SmallBlacklistedView = Backbone.View.extend({
-            el: '#small-blacklisted',
-            render: function (emails) {
-                var template = _.template($('#blacklisted-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                updateEmailCount("#blacklisted-title-small", "Blacklisted", emails.models);
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var RegularBlacklistedView = Backbone.View.extend({
-            el: '#regular-blacklisted',
-            render: function (emails) {
-                var template = _.template($('#blacklisted-template').html(), {
-                    that: this,
-                    emails: emails.models
-                });
-                updateEmailCount("#blacklisted-title-regular", "Blacklisted", emails.models);
-                this.$el.html(template);
-                $(document).foundation('tab', 'reflow');
-            }
-        });
-
-        var smallInboxView = new SmallInboxView();
-        var regularInboxView = new RegularInboxView();
-        var smallSentView = new SmallSentView();
-        var regularSentView = new RegularSentView();
-        var smallArchivedView = new SmallArchivedView();
-        var regularArchivedView = new RegularArchivedView();
-        var smallBlacklistedView = new SmallBlacklistedView();
-        var regularBlacklistedView = new RegularBlacklistedView();
-
-        $.get("/emails/refresh");
-
-        var updateInbox = function () {
-            inboxEmails.fetch({
-                data: {
-                    mailbox_type: 'inbox'
-                },
-                success: function (emails) {
-                    onSuccess();
-                    smallInboxView.render(emails);
-                    regularInboxView.render(emails);
-                }
-            });
-        };
-
-        var updateSent = function () {
-            sentEmails.fetch({
-                data: {
-                    mailbox_type: 'sent'
-                },
-                success: function (emails) {
-                    onSuccess();
-                    smallSentView.render(emails);
-                    regularSentView.render(emails);
-                }
-            });
-        };
-
-        var updateArchived = function () {
-            archivedEmails.fetch({
-                data: {
-                    mailbox_type: 'archived'
-                },
-                success: function (emails) {
-                    onSuccess();
-                    smallArchivedView.render(emails);
-                    regularArchivedView.render(emails);
-                }
-            });
-        };
-
-        var updateBlacklisted = function () {
-            blacklistedEmails.fetch({
-                data: {
-                    mailbox_type: 'blacklisted'
-                },
-                success: function (emails) {
-                    onSuccess();
-                    smallBlacklistedView.render(emails);
-                    regularBlacklistedView.render(emails);
-                }
-            });
-        };
-
-        updateInbox();
-        updateSent();
-        updateArchived();
-        updateBlacklisted();
-        timer1 = setInterval(function () {
-            $.get("/emails/refresh").fail(onFailure()).success(onSuccess());
-        }, 60000);
-        timer2 = setInterval(function () {
-            updateInbox();
-            updateSent();
-            updateArchived();
-            updateBlacklisted();
-        }, 15000);
-
-        $(document).foundation();
-    }());
-
-</script>

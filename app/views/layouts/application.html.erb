@@ -22,17 +22,6 @@
 
 <body>
 
-<script>
-    // turn off any polling timers
-    if (typeof timer1 != 'undefined') {
-        clearInterval(timer1);
-    }
-    if (typeof timer2 != 'undefined') {
-        clearInterval(timer2);
-    }
-</script>
-
-
 <% if user_signed_in? %>
     <% if alert %>
         <div data-alert class="alert-box alert">
