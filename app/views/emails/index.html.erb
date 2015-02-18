@@ -23,7 +23,7 @@
       </div>
     </div>
     <%% if (emails.length > 0) { %>
-    <div class="show-for-small">
+    <div class="show-for-small-only">
       <table>
         <tbody>
         <%% _.each(emails, function(email) { %>
@@ -90,7 +90,7 @@
       </div>
     </div>
     <%% if (emails.length > 0) { %>
-    <div class="show-for-small">
+    <div class="show-for-small-only">
       <table>
         <tbody>
         <%% _.each(emails, function(email) { %>
@@ -149,7 +149,7 @@
       </div>
     </div>
     <%% if (emails.length > 0) { %>
-    <div class="show-for-small">
+    <div class="show-for-small-only">
       <table>
         <tbody>
         <%% _.each(emails, function(email) { %>
@@ -211,7 +211,7 @@
     <div data-alert class="alert-box alert">
       These messages will be deleted after one week
     </div>
-    <div class="show-for-small">
+    <div class="show-for-small-only">
       <table>
         <tbody>
         <%% _.each(emails, function(email) { %>
@@ -426,7 +426,6 @@
           setInterval(pop, 60000);
           setInterval(renderAll, 15000);
 
-          $(document).foundation();
       }());
 
   </script>

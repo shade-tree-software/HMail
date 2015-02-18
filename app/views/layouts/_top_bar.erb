@@ -28,7 +28,7 @@
           <li><%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'button' %></li>
       <% end %>
     </ul>
-    <ul class="right show-for-small-down">
+    <ul class="right show-for-small-only">
       <% if user_signed_in? %>
           <% if params[:controller] == 'emails' && params[:action] == 'index' %>
               <li><%= link_to 'Compose a message', new_email_path %></li>
