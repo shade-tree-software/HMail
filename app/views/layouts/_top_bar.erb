@@ -16,14 +16,14 @@
     <ul class="right show-for-medium-up">
       <% if user_signed_in? %>
           <% if params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to 'Compose New Message', new_email_path, :class => 'button show-for-medium-down' %></li>
+              <li><%= link_to 'Compose Message', new_email_path, :class => 'button show-for-medium-down' %></li>
           <% else %>
               <li><%= link_to "Home", '/', :class => 'button' %></li>
               <li><%= link_to "Back", :back, :class => 'button' %></li>
           <% end %>
           <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
               <li><%= link_to "Approve Friends", friends_path, :class => 'button' %></li>
-              <li><%= link_to "Add New User", new_registration_path(:user), :class => 'button' %></li>
+              <li><%= link_to "Add User", new_registration_path(:user), :class => 'button' %></li>
           <% end %>
           <li><%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'button' %></li>
       <% end %>
@@ -31,14 +31,14 @@
     <ul class="right show-for-small-only">
       <% if user_signed_in? %>
           <% if params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to 'Compose a message', new_email_path %></li>
+              <li><%= link_to 'Compose Message', new_email_path %></li>
           <% else %>
               <li><%= link_to "Home", '/'%></li>
               <li><%= link_to "Back", :back %></li>
           <% end %>
           <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to "Approved Friends", friends_path %></li>
-              <li><%= link_to "New User", new_registration_path(:user)%></li>
+              <li><%= link_to "Approve Friends", friends_path %></li>
+              <li><%= link_to "Add User", new_registration_path(:user)%></li>
           <% end %>
           <li><%= link_to "Logout", destroy_user_session_path, method: :delete %></li>
       <% end %>
