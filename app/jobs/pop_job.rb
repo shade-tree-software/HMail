@@ -18,7 +18,8 @@ class PopJob < ActiveJob::Base
       end
 
       # get mail messages from pop server
-      mails = [Mail.last]
+      #mails = [Mail.last]
+      mails = Mail.all
 
       # insert messages into database only if they are unique (sometimes we get duplicates
       # from the pop server)
