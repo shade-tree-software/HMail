@@ -4,7 +4,7 @@
 <script>
     $(document).ready(function () {
         var $email_text_elem = $('#email_text');
-        $email_text_elem.html($email_text_elem.text().replace(/\n\r?/g, '<br />'));
+        $email_text_elem.html($email_text_elem.html().replace(/\n\r?/g, '<br />'));
         var $date_elem = $('#date');
         var date = new Date(parseInt($date_elem.text()) * 1000);
         $date_elem.text(date.toLocaleString());

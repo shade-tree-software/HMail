@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     member do
       get 'archive'
       get 'reply'
+      get 'image'
     end
     collection do
       get 'refresh'

@@ -37,27 +37,37 @@ class Email < ActiveRecord::Base
     end
   end
 
+  def assemble_parts(part, args)
+    if part.multipart?
+      part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
+    else
+      if part.content_type.start_with? 'text/html'
+        nil
+      elsif part.content_type.start_with? 'text/plain'
+        part.decoded
+      elsif part.content_type.start_with? 'image/'
+        @image_count += 1
+        Dir.mkdir('media') unless Dir.exists?('media')
+        tempfile = File.new "media/#{user.id}_#{id}_#{@image_count}_#{part.filename}", 'w', :encoding => 'binary'
+        tempfile.write part.decoded
+        tempfile.flush
+        "<img src=\"/emails/#{id}/image?filename=#{@image_count}_#{part.filename}\" alt=\"Image: #{part.filename}\">"
+      else
+        if args[:show_warnings]
+          "<p style=\"color:red\">Attachment Removed: [#{part.content_type}]</p>"
+        else
+          nil
+        end
+      end
+    end
+  end
+
   def text(args = {})
     if self.body.nil?
       ''
     else
-      mail = Mail.read_from_string(self.body)
-      if mail.multipart?
-        parts = mail.parts
-      else
-        parts = [mail]
-      end
-      parts.collect do |part|
-        if part.content_type.start_with? 'text/plain'
-          part.decoded
-        else
-          if args[:show_warnings]
-            "<p style=\"color:red\">Attachment Removed: [#{part.content_type}]</p>"
-          else
-            nil
-          end
-        end
-      end.join("\n")
+      @image_count = 0
+      assemble_parts Mail.read_from_string(self.body), args
     end
   end
 
