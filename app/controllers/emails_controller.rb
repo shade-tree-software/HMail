@@ -98,6 +98,13 @@ class EmailsController < ApplicationController
     render nothing: true
   end
 
+  def image
+    filename = "media/#{current_user.id}_#{params[:id]}_#{params[:filename]}"
+    image_data = File.read filename
+    File.delete filename
+    send_data image_data
+  end
+
   private
   def set_email
     @email = Email.find(params[:id])
