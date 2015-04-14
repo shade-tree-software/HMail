@@ -24,6 +24,7 @@ class PopJob < ActiveJob::Base
       # insert messages into database only if they are unique (sometimes we get duplicates
       # from the pop server)
       if mails
+        mails.compact!
         mails.each do |mail|
           begin
             Email.find_or_create_by(
