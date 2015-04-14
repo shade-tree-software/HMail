@@ -18,7 +18,7 @@ class PopJob < ActiveJob::Base
       end
 
       # get mail messages from pop server
-      mails = Mail.last
+      mails = Mail.first(count => 5)
       #mails = Mail.all
 
       # insert messages into database only if they are unique (sometimes we get duplicates
@@ -44,6 +44,11 @@ class PopJob < ActiveJob::Base
             # Just try again, and this time it should find the matching record created
             # by the other process and should not try to create the duplicate.
             retry
+          rescue StandardError => e
+            puts 'Failed to store retrieved email.  ' + e.message
+          rescue Exception => e
+            puts 'Failed to store retrieved email.  ' + e.message
+            raise e
           end
         end
       end
