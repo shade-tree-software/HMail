@@ -21,6 +21,7 @@ class Email < ActiveRecord::Base
       when 'unapproved'
         Email.where(user_id: user.id)
             .where("\"from\" not in (?)", user.friends.select(:email))
+            .where(sent: false)
             .where("date < #{Time.now.to_i - 604800}").delete_all
         Email.select(:id, :from, :subject, :date, :unread)
             .where(user_id: user.id)
