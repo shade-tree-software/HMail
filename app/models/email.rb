@@ -42,7 +42,9 @@ class Email < ActiveRecord::Base
     if part.multipart?
       part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
     else
-      if part.content_type.start_with? 'text/html'
+      if part.content_type.nil?
+        part.body
+      elsif part.content_type.start_with? 'text/html'
         nil
       elsif part.content_type.start_with? 'text/plain'
         part.decoded
