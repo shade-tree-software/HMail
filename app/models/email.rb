@@ -43,7 +43,7 @@ class Email < ActiveRecord::Base
       part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
     else
       if part.content_type.nil?
-        part.body
+        part
       elsif part.content_type.start_with? 'text/html'
         nil
       elsif part.content_type.start_with? 'text/plain'
