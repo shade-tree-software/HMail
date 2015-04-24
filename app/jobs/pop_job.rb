@@ -37,6 +37,7 @@ class PopJob < ActiveJob::Base
               new_email.archived = false
               new_email.sent = mail.from.first == user_name
               new_email.unread = true
+              new_email.deleted = false
             end
           rescue ActiveRecord::RecordNotUnique
             # find_or_create_by is not atomic.  If we get a RecordNotUnique exception it

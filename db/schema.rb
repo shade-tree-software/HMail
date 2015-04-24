@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150217021354) do
+ActiveRecord::Schema.define(version: 20150424115411) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20150217021354) do
     t.string   "from"
     t.integer  "date"
     t.boolean  "unread"
+    t.boolean  "deleted"
   end
 
   add_index "emails", ["user_id", "subject", "to", "from", "date"], name: "emails_user_id_subject_to_from_date_key", unique: true, using: :btree

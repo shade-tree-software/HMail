@@ -70,7 +70,8 @@ class EmailsController < ApplicationController
                        :to => recipient,
                        :from => sender,
                        :subject => subj,
-                       :date => mail.date.to_i)
+                       :date => mail.date.to_i,
+                       :deleted => false)
     @email.save
     respond_with(@email)
   end
@@ -81,8 +82,9 @@ class EmailsController < ApplicationController
   #end
 
   def destroy
-    @email.destroy
-    respond_with(@email)
+    @email[:deleted] = true
+    @email.save
+    redirect_to emails_url
   end
 
   def archive

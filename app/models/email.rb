@@ -19,14 +19,20 @@ class Email < ActiveRecord::Base
             .where(archived: true)
             .order(date: :desc)
       when 'unapproved'
-        Email.where(user_id: user.id)
-            .where("\"from\" not in (?)", user.friends.select(:email))
-            .where(sent: false)
-            .where("date < #{Time.now.to_i - 604800}").delete_all
+        deleteables = Email.where(user_id: user.id)
+                          .where("\"from\" not in (?)", user.friends.select(:email))
+                          .where(sent: false)
+                          .where(deleted: [false, nil])
+                          .where("date < #{Time.now.to_i - 604800}")
+        deleteables.each do |d|
+          d[:deleted] = true
+          d.save
+        end
         Email.select(:id, :from, :subject, :date, :unread)
             .where(user_id: user.id)
             .where("\"from\" not in (?)", user.friends.select(:email))
             .where(sent: false)
+            .where(deleted: [false, nil])
             .order(date: :desc)
       else # inbox
         Email.select(:id, :from, :subject, :date, :unread)
@@ -43,7 +49,7 @@ class Email < ActiveRecord::Base
       part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
     else
       if part.content_type.nil?
-        part.body
+        part.body.to_s # Not sure if this really works.  We don't seem to handle non-multipart messages correctly.
       elsif part.content_type.start_with? 'text/html'
         nil
       elsif part.content_type.start_with? 'text/plain'
