@@ -29,7 +29,7 @@ class PopJob < ActiveJob::Base
           begin
             Email.find_or_create_by(
                 user_id: user.id,
-                subject: mail.subject,
+                subject: mail.subject || '(no subject)',
                 to: mail.to.first,
                 from: mail.from.first,
                 date: mail.date.to_i) do |new_email|
