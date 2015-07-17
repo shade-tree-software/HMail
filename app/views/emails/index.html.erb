@@ -6,6 +6,12 @@
     <%= render 'regular_mailboxes' %>
   </div>
 
+  <label for="page-num">Page #:</label>
+  <input id="page-num" type="text" value="1">
+
+  <label for="limit">Messages Per Page:</label>
+  <input id="limit" type="text" value="10">
+
   <script type="text/template" id="inbox-template">
     <div data-alert class="server-alert alert"></div>
     <div class="row">
@@ -316,9 +322,13 @@
               el: '.inbox',
               render: function () {
                   var that = this;
+                  var limit = $('#limit').val();
+                  var offset = (Number($('#page-num').val()) - 1) * Number(limit);
                   inboxEmails.fetch({
                       data: {
-                          mailbox_type: 'inbox'
+                          mailbox_type: 'inbox',
+                          limit: limit || 10,
+                          offset: offset || 0
                       },
                       success: function (emails) {
                           onSuccess();
@@ -411,7 +421,7 @@
               $.get("/emails/refresh").fail(onFailure).success(onSuccess);
           };
 
-          var renderAll = function(){
+          var renderAll = function () {
               if (lastConnectTime.getTime() + 30000 < new Date().getTime()) {
                   $(".server-alert").html("Unable to connect to server.  Retrying...").addClass("alert-box");
               }

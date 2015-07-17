@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20150424115411) do
   end
 
   add_index "emails", ["user_id", "subject", "to", "from", "date"], name: "emails_user_id_subject_to_from_date_key", unique: true, using: :btree
+  add_index "emails", ["user_id", "to", "from", "subject", "date"], name: "emails_user_id_to_from_subject_date_key", unique: true, using: :btree
 
   create_table "friends", force: :cascade do |t|
     t.string   "first_name"

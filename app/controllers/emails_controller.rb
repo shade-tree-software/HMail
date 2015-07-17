@@ -9,7 +9,7 @@ class EmailsController < ApplicationController
   respond_to :html, :json
 
   def index
-    emails = Email.sync_mailbox(current_user, params[:mailbox_type])
+    emails = Email.sync_mailbox(current_user, params[:mailbox_type], params[:limit] || 100, params[:offset] || 0)
     respond_with(emails)
   end
 
