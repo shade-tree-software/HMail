@@ -50,11 +50,11 @@ class Email < ActiveRecord::Base
     else
       if part.content_type.nil?
         part.body.to_s # Not sure if this really works.  We don't seem to handle non-multipart messages correctly.
-      elsif part.content_type.start_with? 'text/html'
+      elsif part.content_type.start_with?('text/html') && !args[:text_only]
         nil
       elsif part.content_type.start_with? 'text/plain'
         part.decoded
-      elsif part.content_type.start_with? 'image/'
+      elsif part.content_type.start_with?('image/') && !args[:text_only]
         @image_count += 1
         Dir.mkdir('media') unless Dir.exists?('media')
         tempfile = File.new "media/#{user.id}_#{id}_#{@image_count}_#{part.filename}", 'w', :encoding => 'binary'
@@ -83,7 +83,7 @@ class Email < ActiveRecord::Base
   def build_reply
     friend = Friend.find_by_email(from)
     friends = [[friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]]
-    original_lines = text.split("\n").collect do |line|
+    original_lines = text(text_only: true).split("\n").collect do |line|
       "> #{line}"
     end
     preamble = original_lines.empty? ? '' : "\n\nOn #{Time.at(date).utc.to_s} #{from} wrote: \n"
