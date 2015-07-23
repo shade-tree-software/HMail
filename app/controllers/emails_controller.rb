@@ -53,14 +53,19 @@ class EmailsController < ApplicationController
     end
     recipient = Friend.find(params[:email][:to].to_i).email
     subj = params[:email][:subject]
-    msg = params[:email][:message]
-    pic = params[:email][:picture]
     mail = Mail.new do
       to recipient
       from sender
       subject subj
+    end
+
+    msg = params[:email][:message]
+    text_part = Mail::Part.new do
       body msg
     end
+    mail.text_part = text_part
+
+    pic = params[:email][:picture]
     mail.attachments[pic.original_filename] = pic.read if pic
 
     mail.deliver! unless current_user.email == 'none@nowhere.com'
