@@ -1,0 +1,24 @@
+<html>
+<p id="last_status">no status</p>
+<p id="current_status">no status</p>
+</html>
+
+<script>
+    (function () {
+        var interval = 1000 * 60 * 5; // every five minutes
+        setInterval(function () {
+            jQuery.get("/emails/refresh_all", function () {
+                t = new Date();
+                jQuery("#last_status").html("last updated at " + t.toUTCString());
+                t.setMilliseconds(t.getMilliseconds() + interval);
+                jQuery("#current_status").html("next update at " + t.toUTCString());
+            }).fail(function () {
+                t = new Date();
+                jQuery("#last_status").html("last update failed at " + t.toUTCString());
+                t.setMilliseconds(t.getMilliseconds() + interval);
+                jQuery("#current_status").html("next attempt at " + t.toUTCString());
+            })
+        }, interval)
+    }());
+
+</script>

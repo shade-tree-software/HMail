@@ -4,6 +4,7 @@ require 'friend'
 require 'queueclassicjob'
 
 class EmailsController < ApplicationController
+  skip_before_filter :authenticate_user!, only: [:refresh_all, :auto_refresh]
   before_action :set_email, only: [:show, :edit, :update, :destroy, :archive, :reply]
 
   respond_to :html, :json
@@ -105,6 +106,19 @@ class EmailsController < ApplicationController
     #PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
     PopJob.perform_later(current_user.id)
     render nothing: true
+  end
+
+  def refresh_all
+    User.all.each do |user|
+      unless user.email == 'none@nowhere.com' || user.email == 'guest@nowhere.none'
+        PopJob.perform_later(user.id, 1)
+      end
+    end
+    render nothing: true
+  end
+
+  def auto_refresh
+
   end
 
   def image

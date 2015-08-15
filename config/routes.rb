@@ -10,6 +10,8 @@ Rails.application.routes.draw do
     end
     collection do
       get 'refresh'
+      get 'refresh_all'
+      get 'auto_refresh'
     end
   end
 

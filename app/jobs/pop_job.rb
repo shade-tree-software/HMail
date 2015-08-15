@@ -3,10 +3,11 @@ require 'user'
 class PopJob < ActiveJob::Base
   queue_as :default
 
-  def perform(user_id)
+  def perform(user_id, count = 5)
     user = User.find(user_id)
-    unless user.email == 'none@nowhere.com'
+    unless user.email == 'none@nowhere.com' || user.email == 'guest@nowhere.none'
       user_name = user.email
+      puts "Performing PopJob on #{user_name}, requesting #{count} #{'email'.pluralize(count)}."
       password = user.email_pw
       Mail.defaults do
         retriever_method :pop3,
@@ -18,7 +19,7 @@ class PopJob < ActiveJob::Base
       end
 
       # get mail messages from pop server
-      mails = Mail.first(:count => 5)
+      mails = Mail.first(:count => count)
       #mails = Mail.all
 
       # insert messages into database only if they are unique (sometimes we get duplicates
