@@ -11,6 +11,9 @@
         </div>
     <% end %>
 
+    <div class="actions row">
+      <%= f.submit 'Send', {:class => 'medium round button'} %>
+    </div>
     <div class="field row">
       <%= f.label :to %>
       <%= f.select(:to, @params[:recipients]) %>
