@@ -1,6 +1,6 @@
 == HMail
 
-A responsive mobile-friendly website in ruby on rails and backbone.js that offers children an alternate way to use gmail such that parents can monitor the child's email activity and  set up a whitelist of email contacts.  Children are completely isolated from spam and cannot send to or receive from contacts who are not on the whitelist.
+A website that offers children an alternate way to use gmail such that parents can monitor their children's email activity and set up a whitelist of email contacts.  Children are completely isolated from spam and cannot send to or receive from contacts who are not on the whitelist.
 
 * Responsive
 * Mobile-Friendly
