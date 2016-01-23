@@ -81,13 +81,13 @@ class Email < ActiveRecord::Base
   end
 
   def build_reply(current_user)
-    recipients = (to.split(',') << from) - [current_user.email]
+    recipients = (to.delete(' ').split(',') << from) - [current_user.email]
     friendly_emails = current_user.friends.map { |f| f.email }
     friendly_ids = current_user.friends.map { |f| f.id }
     recipients.select! { |r| friendly_emails.include? r }
     recipient_ids = recipients.map { |r| friendly_ids[friendly_emails.index(r)] }
     friends = current_user.friends.map do |friend|
-      [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
+      [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
     original_lines = text(text_only: true).split("\n").collect do |line|
       "> #{line}"

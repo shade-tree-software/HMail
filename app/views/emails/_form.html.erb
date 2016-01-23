@@ -16,7 +16,10 @@
     </div>
     <div class="field row">
       <%= f.label :to %>
-      <%= f.select(:to, options_for_select(@params[:friends], @params[:recipients]), {}, {multiple: true, style: 'height: auto', required: true}) %>
+      <%= f.select(:to,
+                   options_for_select(@params[:friends], @params[:recipients]),
+                   {},
+                   {multiple: true, style: 'height: auto', required: true}) %>
     </div>
     <div class="field row">
       <%= f.label :subject %>

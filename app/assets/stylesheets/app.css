@@ -4,6 +4,7 @@
     max-width: 100%;
     width: 90%;
 }
+
 .tabs.vertical.regular {
     max-width: 100%;
     width: 100%;
@@ -11,4 +12,13 @@
 
 li {
     list-style: none;
+}
+
+.emailRecipient {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+select option:nth-child(odd) {
+    background: #F7F7F7;
 }

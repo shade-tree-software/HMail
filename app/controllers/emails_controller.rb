@@ -23,7 +23,7 @@ class EmailsController < ApplicationController
 
   def new
     friends = current_user.friends.collect do |friend|
-      [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
+      [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
     @params = {friends: friends, recipients: []}
     @email = Email.new
@@ -79,7 +79,7 @@ class EmailsController < ApplicationController
                        :user_id => current_user.id,
                        :archived => false,
                        :sent => true,
-                       :to => recipients.join(','),
+                       :to => recipients.join(', '),
                        :from => sender,
                        :subject => subj,
                        :date => mail.date.to_i,
