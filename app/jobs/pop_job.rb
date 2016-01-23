@@ -31,7 +31,7 @@ class PopJob < ActiveJob::Base
             Email.find_or_create_by(
                 user_id: user.id,
                 subject: mail.subject || '(no subject)',
-                to: (mail.to + mail.cc).join(', '),
+                to: ((mail.to || []) + (mail.cc || [])).join(', '),
                 from: mail.from.first,
                 date: mail.date.to_i) do |new_email|
               new_email.body = mail.to_s
