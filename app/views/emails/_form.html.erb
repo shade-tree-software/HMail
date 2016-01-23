@@ -17,6 +17,8 @@
 
     <div id="sendAlert" data-alert hidden class="row alert-box warning">
     </div>
+    <div id="sendCount" data-alert hidden class="row alert-box info">
+    </div>
 
     <div class="field row">
       <%= f.label :to %>
@@ -45,16 +47,24 @@
 <% end %>
 
 <script>
+    var checkForMultipleRecipients = function(){
+        var recipientCount = jQuery('#email_to').find('option:selected').length;
+        if (recipientCount > 1){
+            jQuery("#sendCount").html('You are sending to ' + recipientCount + ' people.').show();
+        } else{
+            jQuery("#sendCount").empty().hide();
+        }
+    };
+    checkForMultipleRecipients();
     window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
     jQuery("#email_to").change(function(){
         var recipientCount = jQuery('#email_to').find('option:selected').length;
-        $sendAlert = jQuery("#sendAlert");
         if (window.threadParticipantCount > 1 && recipientCount > 0 && recipientCount < window.threadParticipantCount) {
-            jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".");
-            $sendAlert.show();
+            jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".").show();
+            jQuery("#sendCount").empty().hide();
         } else {
-            jQuery("#sendAlert").empty();
-            $sendAlert.hide();
+            jQuery("#sendAlert").empty().hide();
+            checkForMultipleRecipients();
         }
     });
     // set textareas to auto resize
