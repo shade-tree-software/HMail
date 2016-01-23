@@ -25,7 +25,7 @@ class EmailsController < ApplicationController
     friends = current_user.friends.collect do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
-    @params = {friends: friends, recipients: []}
+    @params = {friends: friends, recipients: [], thread_participant_count: 0}
     @email = Email.new
     respond_with(@email)
   end

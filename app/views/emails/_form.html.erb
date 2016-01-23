@@ -14,6 +14,10 @@
     <div class="actions row">
       <%= f.submit 'Send', {:class => 'medium round button'} %>
     </div>
+
+    <div id="sendAlert" data-alert hidden class="row alert-box warning">
+    </div>
+
     <div class="field row">
       <%= f.label :to %>
       <%= f.select(:to,
@@ -41,6 +45,18 @@
 <% end %>
 
 <script>
+    window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
+    jQuery("#email_to").change(function(){
+        var recipientCount = jQuery('#email_to').find('option:selected').length;
+        $sendAlert = jQuery("#sendAlert");
+        if (window.threadParticipantCount > 1 && recipientCount > 0 && recipientCount < window.threadParticipantCount) {
+            jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".");
+            $sendAlert.show();
+        } else {
+            jQuery("#sendAlert").empty();
+            $sendAlert.hide();
+        }
+    });
     // set textareas to auto resize
     function h(e) {
         $(e).css({'height': 'auto', 'overflow-y': 'hidden'}).height(e.scrollHeight);
