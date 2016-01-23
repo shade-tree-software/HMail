@@ -25,13 +25,13 @@ class EmailsController < ApplicationController
     friends = current_user.friends.collect do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
     end
-    @params = {:recipients => friends}
+    @params = {friends: friends, recipients: []}
     @email = Email.new
     respond_with(@email)
   end
 
   def reply
-    @params = @email.build_reply
+    @params = @email.build_reply(current_user)
     @email = Email.new
     render :action => :new
     #respond_with(@email)
@@ -52,10 +52,14 @@ class EmailsController < ApplicationController
                               :authentication => 'plain',
                               :enable_starttls_auto => true}
     end
-    recipient = Friend.find(params[:email][:to].to_i).email
+    # reject any items from the to select that are blank,
+    # then map the rest to friend email addresses
+    recipients = params[:email][:to].reject{|r| r.empty?}.map do |recipient|
+      Friend.find(recipient.to_i).email
+    end
     subj = params[:email][:subject]
     mail = Mail.new do
-      to recipient
+      to recipients
       from sender
       subject subj
     end
@@ -75,7 +79,7 @@ class EmailsController < ApplicationController
                        :user_id => current_user.id,
                        :archived => false,
                        :sent => true,
-                       :to => recipient,
+                       :to => recipients.join(','),
                        :from => sender,
                        :subject => subj,
                        :date => mail.date.to_i,

@@ -80,9 +80,15 @@ class Email < ActiveRecord::Base
     end
   end
 
-  def build_reply
-    friend = Friend.find_by_email(from)
-    friends = [[friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]]
+  def build_reply(current_user)
+    recipients = (to.split(',') << from) - [current_user.email]
+    friendly_emails = current_user.friends.map { |f| f.email }
+    friendly_ids = current_user.friends.map { |f| f.id }
+    recipients.select! { |r| friendly_emails.include? r }
+    recipient_ids = recipients.map { |r| friendly_ids[friendly_emails.index(r)] }
+    friends = current_user.friends.map do |friend|
+      [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id]
+    end
     original_lines = text(text_only: true).split("\n").collect do |line|
       "> #{line}"
     end
@@ -90,7 +96,7 @@ class Email < ActiveRecord::Base
     reply_text = preamble + original_lines.join("\n")
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
-    {recipients: friends, subject: new_subject, reply_text: reply_text, is_reply: true}
+    {recipients: recipient_ids, friends: friends, subject: new_subject, reply_text: reply_text, is_reply: true}
   end
 
 end

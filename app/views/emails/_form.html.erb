@@ -16,7 +16,7 @@
     </div>
     <div class="field row">
       <%= f.label :to %>
-      <%= f.select(:to, @params[:recipients]) %>
+      <%= f.select(:to, options_for_select(@params[:friends], @params[:recipients]), {}, {multiple: true, style: 'height: auto'}) %>
     </div>
     <div class="field row">
       <%= f.label :subject %>

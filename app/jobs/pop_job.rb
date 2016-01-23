@@ -31,12 +31,12 @@ class PopJob < ActiveJob::Base
             Email.find_or_create_by(
                 user_id: user.id,
                 subject: mail.subject || '(no subject)',
-                to: mail.to.first,
+                to: mail.to.join(','),
                 from: mail.from.first,
                 date: mail.date.to_i) do |new_email|
               new_email.body = mail.to_s
               new_email.archived = false
-              new_email.sent = mail.from.first == user_name
+              new_email.sent = (mail.from.first == user_name)
               new_email.unread = true
               new_email.deleted = false
             end

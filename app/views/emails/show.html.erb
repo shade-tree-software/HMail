@@ -31,13 +31,15 @@
 
 <div class="row">
   <p>
-    <% if @email.sent %>
-        <strong>To:</strong>
-        <%= @email.to %>
-    <% else %>
-        <strong>From:</strong>
-        <%= @email.from %>
-    <% end %>
+    <strong>To:</strong>
+    <%= @email.to %>
+  </p>
+</div>
+
+<div class="row">
+  <p>
+    <strong>From:</strong>
+    <%= @email.from %>
   </p>
 </div>
 
