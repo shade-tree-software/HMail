@@ -47,6 +47,7 @@
 <% end %>
 
 <script>
+    window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
     var checkForMultipleRecipients = function(){
         var recipientCount = jQuery('#email_to').find('option:selected').length;
         if (recipientCount > 1){
@@ -55,9 +56,7 @@
             jQuery("#sendCount").empty().hide();
         }
     };
-    checkForMultipleRecipients();
-    window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
-    jQuery("#email_to").change(function(){
+    var checkForRecipientCountMismatch = function(){
         var recipientCount = jQuery('#email_to').find('option:selected').length;
         if (window.threadParticipantCount > 1 && recipientCount > 0 && recipientCount < window.threadParticipantCount) {
             jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".").show();
@@ -66,7 +65,10 @@
             jQuery("#sendAlert").empty().hide();
             checkForMultipleRecipients();
         }
-    });
+    };
+    checkForMultipleRecipients();
+    checkForRecipientCountMismatch();
+    jQuery("#email_to").change(checkForRecipientCountMismatch);
     // set textareas to auto resize
     function h(e) {
         $(e).css({'height': 'auto', 'overflow-y': 'hidden'}).height(e.scrollHeight);
