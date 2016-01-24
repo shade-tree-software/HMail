@@ -1,26 +1,36 @@
 <div role="main" class="ui-content">
-  <h2>Approved Friends</h2>
-  <%= link_to 'Create a new friend', new_friend_path, :class => 'ui-btn ui-btn-inline ui-corner-all' %>
+  <div class="row">
+    <h2>Approved Friends</h2>
+  </div>
+  <div class="actions row">
+    <%= link_to 'Create a new friend', new_friend_path, :class => 'medium round button' %>
+  </div>
+  <div class="row">
+    <table data-role="table" data-mode="reflow" class="friends-list ui-responsive" id="friends_table">
+      <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email Address</th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
 
-  <table data-role="table" data-mode="reflow" class="friends-list ui-responsive" id="friends_table">
-    <thead>
-    <tr>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Email Address</th>
-      <th></th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <% @friends.each do |friend| %>
-        <tr>
-          <td><%= friend.first_name %></td>
-          <td><%= friend.last_name %></td>
-          <td><%= friend.email %></td>
-          <td><%= link_to 'Edit', edit_friend_path(friend), :class => 'ui-btn ui-btn-inline ui-corner-all ui-mini' %></td>
-        </tr>
-    <% end %>
-    </tbody>
-  </table>
+      <tbody>
+      <% @friends.each do |friend| %>
+          <tr>
+            <td><%= friend.first_name %></td>
+            <td><%= friend.last_name %></td>
+            <td><%= friend.email %></td>
+            <td><%= link_to 'Edit', edit_friend_path(friend) %></td>
+            <td>
+              <% if friend.users.empty? %>
+                  <%= link_to "Delete", friend_path(friend), {method: :delete, data: {confirm: "Are you sure you want to delete this friend?"}} %>
+              <% end %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 </div>

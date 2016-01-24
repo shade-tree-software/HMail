@@ -11,20 +11,27 @@
     </div>
   <% end %>
 
-    <div class="field">
+    <div class="field row">
       <%= f.label :first_name %>
       <%= f.text_field :first_name, autofocus: true %>
     </div>
-    <div class="field">
+    <div class="field row">
       <%= f.label :last_name %>
       <%= f.text_field :last_name %>
     </div>
-    <div class="field">
+    <div class="field row">
       <%= f.label :email %>
       <%= f.email_field :email %>
     </div>
+    <div class="field row">
+      <%= f.label :users %>
+      <%= f.select(:users,
+                   options_for_select(@params[:all_users], @params[:user_friends]),
+                   {},
+                   {multiple: true, style: 'height: auto'}) %>
+    </div><br>
 
-  <div class="actions">
-    <%= f.submit params[:action] == 'edit' ? 'Apply' : 'Add Friend', 'data-inline' => :true %>
+  <div class="actions row">
+    <%= f.submit params[:action] == 'edit' ? 'Apply' : 'Add Friend', {:class => 'medium round button', 'data-inline' => :true} %>
   </div>
 <% end %>
