@@ -19,28 +19,41 @@ class Email < ActiveRecord::Base
             .where(archived: true)
             .order(date: :desc)
       when 'unapproved'
-        deleteables = Email.where(user_id: user.id)
-                          .where("\"from\" not in (?)", user.friends.select(:email))
-                          .where(sent: false)
-                          .where(deleted: [false, nil])
-                          .where("date < #{Time.now.to_i - 604800}")
-        deleteables.each do |d|
-          d[:deleted] = true
-          d.save
+        if user.allow_unapproved
+          nil
+        else
+          deleteables = Email.where(user_id: user.id)
+                            .where("\"from\" not in (?)", user.friends.select(:email))
+                            .where(sent: false)
+                            .where(deleted: [false, nil])
+                            .where("date < #{Time.now.to_i - 604800}")
+          deleteables.each do |d|
+            d[:deleted] = true
+            d.save
+          end
+          Email.select(:id, :from, :subject, :date, :unread)
+              .where(user_id: user.id)
+              .where("\"from\" not in (?)", user.friends.select(:email))
+              .where(sent: false)
+              .where(deleted: [false, nil])
+              .order(date: :desc)
         end
-        Email.select(:id, :from, :subject, :date, :unread)
-            .where(user_id: user.id)
-            .where("\"from\" not in (?)", user.friends.select(:email))
-            .where(sent: false)
-            .where(deleted: [false, nil])
-            .order(date: :desc)
       else # inbox
-        Email.select(:id, :from, :subject, :date, :unread)
-            .where(user_id: user.id)
-            .where("\"from\" in (?)", user.friends.select(:email))
-            .where(archived: false)
-            .where(sent: false)
-            .order(date: :desc)
+        if user.allow_unapproved
+          Email.select(:id, :from, :subject, :date, :unread)
+              .where(user_id: user.id)
+              .where(archived: false)
+              .where(sent: false)
+              .where(deleted: [false, nil])
+              .order(date: :desc)
+        else
+          Email.select(:id, :from, :subject, :date, :unread)
+              .where(user_id: user.id)
+              .where("\"from\" in (?)", user.friends.select(:email))
+              .where(archived: false)
+              .where(sent: false)
+              .order(date: :desc)
+        end
     end
   end
 
@@ -96,7 +109,15 @@ class Email < ActiveRecord::Base
     reply_text = preamble + original_lines.join("\n")
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
-    {recipients: recipient_ids, friends: friends, subject: new_subject, reply_text: reply_text, is_reply: true, thread_participant_count: orig_recipients.size}
+    {
+        recipients: current_user.allow_unapproved? ? orig_recipients.join(', ') : recipient_ids,
+        friends: friends,
+        subject: new_subject,
+        reply_text: reply_text,
+        is_reply: true,
+        thread_participant_count: orig_recipients.size,
+        allow_unapproved: current_user.allow_unapproved
+    }
   end
 
 end

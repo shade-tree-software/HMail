@@ -22,10 +22,14 @@
 
     <div class="field row">
       <%= f.label :to %>
-      <%= f.select(:to,
-                   options_for_select(@params[:friends], @params[:recipients]),
-                   {},
-                   {multiple: true, style: 'height: auto', required: true}) %>
+      <% if @params[:allow_unapproved] %>
+          <%= f.text_field :to, :value => @params[:recipients], required: true %>
+      <% else %>
+          <%= f.select(:to,
+                       options_for_select(@params[:friends], @params[:recipients]),
+                       {},
+                       {multiple: true, style: 'height: auto', required: true}) %>
+      <% end %>
     </div>
     <div class="field row">
       <%= f.label :subject %>
@@ -47,36 +51,36 @@
 <% end %>
 
 <script>
-    window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
-    var checkForMultipleRecipients = function(){
-        var recipientCount = jQuery('#email_to').find('option:selected').length;
-        if (recipientCount > 1){
-            jQuery("#sendCount").html('You are sending to ' + recipientCount + ' people.').show();
-        } else{
-            jQuery("#sendCount").empty().hide();
-        }
-    };
-    var checkForRecipientCountMismatch = function(){
-        var recipientCount = jQuery('#email_to').find('option:selected').length;
-        var missingParticipantCount = window.threadParticipantCount - recipientCount;
-        if (window.threadParticipantCount > 1 && recipientCount > 0 && missingParticipantCount > 0) {
-            jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".  If you send this message, the other " + (missingParticipantCount === 1 ? "person" : "people") + " will be removed from the conversation.").show();
-            jQuery("#sendCount").empty().hide();
-        } else {
-            jQuery("#sendAlert").empty().hide();
-            checkForMultipleRecipients();
-        }
-    };
-    checkForMultipleRecipients();
-    checkForRecipientCountMismatch();
-    jQuery("#email_to").change(checkForRecipientCountMismatch);
-    // set textareas to auto resize
-    function h(e) {
-        $(e).css({'height': 'auto', 'overflow-y': 'hidden'}).height(e.scrollHeight);
+  window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
+  var checkForMultipleRecipients = function () {
+    var recipientCount = jQuery('#email_to').find('option:selected').length;
+    if (recipientCount > 1) {
+      jQuery("#sendCount").html('You are sending to ' + recipientCount + ' people.').show();
+    } else {
+      jQuery("#sendCount").empty().hide();
     }
-    $('textarea').each(function () {
-        h(this);
-    }).on('input', function () {
-        h(this);
-    });
+  };
+  var checkForRecipientCountMismatch = function () {
+    var recipientCount = jQuery('#email_to').find('option:selected').length;
+    var missingParticipantCount = window.threadParticipantCount - recipientCount;
+    if (window.threadParticipantCount > 1 && recipientCount > 0 && missingParticipantCount > 0) {
+      jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".  If you send this message, the other " + (missingParticipantCount === 1 ? "person" : "people") + " will be removed from the conversation.").show();
+      jQuery("#sendCount").empty().hide();
+    } else {
+      jQuery("#sendAlert").empty().hide();
+      checkForMultipleRecipients();
+    }
+  };
+  checkForMultipleRecipients();
+  checkForRecipientCountMismatch();
+  jQuery("#email_to").change(checkForRecipientCountMismatch);
+  // set textareas to auto resize
+  function h(e) {
+    $(e).css({'height': 'auto', 'overflow-y': 'hidden'}).height(e.scrollHeight);
+  }
+  $('textarea').each(function () {
+    h(this);
+  }).on('input', function () {
+    h(this);
+  });
 </script>

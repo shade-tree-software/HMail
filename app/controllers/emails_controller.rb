@@ -25,7 +25,13 @@ class EmailsController < ApplicationController
     friends = current_user.friends.collect do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
-    @params = {friends: friends, recipients: [], thread_participant_count: 0}
+    @params =
+        {
+            friends: friends,
+            recipients: current_user.allow_unapproved? ? '' : [],
+            thread_participant_count: 0,
+            allow_unapproved: current_user.allow_unapproved
+        }
     @email = Email.new
     respond_with(@email)
   end
@@ -52,10 +58,14 @@ class EmailsController < ApplicationController
                               :authentication => 'plain',
                               :enable_starttls_auto => true}
     end
-    # reject any items from the to select that are blank,
-    # then map the rest to friend email addresses
-    recipients = params[:email][:to].reject{|r| r.empty?}.map do |recipient|
-      Friend.find(recipient.to_i).email
+    if current_user.allow_unapproved
+      recipients = params[:email][:to].delete(' ').split(/,|;/)
+    else
+      # reject any items from the to select that are blank,
+      # then map the rest to friend email addresses
+      recipients = params[:email][:to].reject { |r| r.empty? }.map do |recipient|
+        Friend.find(recipient.to_i).email
+      end
     end
     subj = params[:email][:subject]
     mail = Mail.new do
