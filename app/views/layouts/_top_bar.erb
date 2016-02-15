@@ -22,8 +22,8 @@
               <li><%= link_to "Back", :back, :class => 'button' %></li>
           <% end %>
           <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to "Approve Friends", friends_path, :class => 'button' %></li>
-              <li><%= link_to "Add User", new_registration_path(:user), :class => 'button' %></li>
+              <li><%= link_to "Friends", friends_path, :class => 'button' %></li>
+              <li><%= link_to "Users", new_registration_path(:user), :class => 'button' %></li>
           <% end %>
           <li><%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'button' %></li>
       <% end %>
@@ -37,8 +37,8 @@
               <li><%= link_to "Back", :back %></li>
           <% end %>
           <% if current_user.admin? && params[:controller] == 'emails' && params[:action] == 'index' %>
-              <li><%= link_to "Approve Friends", friends_path %></li>
-              <li><%= link_to "Add User", new_registration_path(:user)%></li>
+              <li><%= link_to "Friends", friends_path %></li>
+              <li><%= link_to "Users", new_registration_path(:user)%></li>
           <% end %>
           <li><%= link_to "Logout", destroy_user_session_path, method: :delete %></li>
       <% end %>
