@@ -11,7 +11,8 @@ class EmailsController < ApplicationController
 
   def index
     emails = Email.sync_mailbox(current_user, params[:mailbox_type])
-    @users = ([current_user.email] + current_user.secondary_users.map {|s| s.email}).join(', ')
+    @users = ([current_user.email] + current_user.secondary_users.map {|s| s.email}).join(', ').gsub('@gmail.com','')
+    @users.count(',') == 1 ? @users.sub!(',', ' and') : @users.sub!(/(.*),/, '\1, and')
     respond_with(emails)
   end
 
