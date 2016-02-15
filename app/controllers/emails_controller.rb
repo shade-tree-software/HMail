@@ -11,6 +11,7 @@ class EmailsController < ApplicationController
 
   def index
     emails = Email.sync_mailbox(current_user, params[:mailbox_type])
+    @users = ([current_user.email] + current_user.secondary_users.map {|s| s.email}).join(', ')
     respond_with(emails)
   end
 
