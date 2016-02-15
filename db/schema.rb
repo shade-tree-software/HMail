@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160214153727) do
+ActiveRecord::Schema.define(version: 20160215163639) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,6 +51,11 @@ ActiveRecord::Schema.define(version: 20160214153727) do
   end
 
   add_index "queue_classic_jobs", ["q_name", "id"], name: "idx_qc_on_name_only_unlocked", where: "(locked_at IS NULL)", using: :btree
+
+  create_table "secondary_account_links", force: :cascade do |t|
+    t.integer "primary_user_id"
+    t.integer "secondary_user_id"
+  end
 
   create_table "userfriends", force: :cascade do |t|
     t.integer "user_id"

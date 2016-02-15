@@ -17,6 +17,8 @@ class User < ActiveRecord::Base
   has_many :emails
   has_many :userfriends
   has_many :friends, :through => :userfriends
+  has_many :secondary_account_links, foreign_key: 'primary_user_id'
+  has_many :secondary_users, :through => :secondary_account_links
 
   attr_encrypted :email_pw, :key => ENV['ENCRYPTION_KEY']
 end
