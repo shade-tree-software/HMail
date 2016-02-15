@@ -14,57 +14,69 @@ class Email < ActiveRecord::Base
             .where(sent: true)
             .order(date: :desc)
       when 'archived'
-        if user.allow_unapproved
-          Email.joins(:user).select(:id, :email, :from, :subject, :date)
-              .where(user_id: user_ids)
-              .where(deleted: [false, nil])
-              .where(archived: true)
-              .order(date: :desc)
-        else
-          Email.joins(:user).select(:id, :email, :from, :subject, :date)
-              .where(user_id: user_ids)
-              .where("\"from\" in (?)", user.friends.select(:email))
-              .where(deleted: [false, nil])
-              .where(archived: true)
-              .order(date: :desc)
-        end
-      when 'unapproved'
-        if user.allow_unapproved
-          nil
-        else
-          deleteables = Email.where(user_id: user.id)
-                            .where("\"from\" not in (?)", user.friends.select(:email))
-                            .where(sent: false)
-                            .where(deleted: [false, nil])
-                            .where("date < #{Time.now.to_i - 604800}")
-          deleteables.each do |d|
-            d[:deleted] = true
-            d.save
+        users = [user] + user.secondary_users
+        emails = users.map do |u|
+          if u.allow_unapproved
+            Email.joins(:user).select(:id, :email, :from, :subject, :date)
+                .where(user_id: u.id)
+                .where(deleted: [false, nil])
+                .where(archived: true)
+                .order(date: :desc)
+          else
+            Email.joins(:user).select(:id, :email, :from, :subject, :date)
+                .where(user_id: u.id)
+                .where("\"from\" in (?)", u.friends.select(:email))
+                .where(deleted: [false, nil])
+                .where(archived: true)
+                .order(date: :desc)
           end
-          Email.select(:id, :from, :subject, :date, :unread)
-              .where(user_id: user.id)
-              .where("\"from\" not in (?)", user.friends.select(:email))
-              .where(sent: false)
-              .where(deleted: [false, nil])
-              .order(date: :desc)
         end
+        emails.flatten.compact.sort { |x, y| y.date <=> x.date }
+      when 'unapproved'
+        users = [user] + user.secondary_users
+        emails = users.map do |u|
+          if u.allow_unapproved
+            nil
+          else
+            deleteables = Email.where(user_id: u.id)
+                              .where("\"from\" not in (?)", u.friends.select(:email))
+                              .where(sent: false)
+                              .where(deleted: [false, nil])
+                              .where("date < #{Time.now.to_i - 604800}")
+            deleteables.each do |d|
+              d[:deleted] = true
+              d.save
+            end
+            Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+                .where(user_id: u.id)
+                .where("\"from\" not in (?)", u.friends.select(:email))
+                .where(sent: false)
+                .where(deleted: [false, nil])
+                .order(date: :desc)
+          end
+        end
+        emails.flatten.compact.sort { |x, y| y.date <=> x.date }
       else # inbox
-        if user.allow_unapproved
-          Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
-              .where(user_id: user_ids)
-              .where(archived: false)
-              .where(sent: false)
-              .where(deleted: [false, nil])
-              .order(date: :desc)
-        else
-          Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
-              .where(user_id: user_ids)
-              .where("\"from\" in (?)", user.friends.select(:email))
-              .where(archived: false)
-              .where(sent: false)
-              .where(deleted: [false, nil])
-              .order(date: :desc)
+        users = [user] + user.secondary_users
+        emails = users.map do |u|
+          if u.allow_unapproved
+            Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+                .where(user_id: u.id)
+                .where(archived: false)
+                .where(sent: false)
+                .where(deleted: [false, nil])
+                .order(date: :desc)
+          else
+            Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+                .where(user_id: u.id)
+                .where("\"from\" in (?)", u.friends.select(:email))
+                .where(archived: false)
+                .where(sent: false)
+                .where(deleted: [false, nil])
+                .order(date: :desc)
+          end
         end
+        emails.flatten.compact.sort { |x, y| y.date <=> x.date }
     end
   end
 

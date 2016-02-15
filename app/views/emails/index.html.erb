@@ -241,6 +241,9 @@
           <td>
             <ul class="list-style: none">
               <%% var date = new Date(email.get('date') * 1000) %>
+              <% unless current_user.secondary_users.empty? %>
+                  <li>User: <%%= email.get('email') %></li>
+              <% end %>
               <li>Date: <%%= date.toLocaleString() %></li>
               <li>From: <%%= email.get('from') %></li>
               <li>
@@ -257,6 +260,9 @@
       <table>
         <thead>
         <tr>
+          <% unless current_user.secondary_users.empty? %>
+              <th>User</th>
+          <% end %>
           <th>Date</th>
           <th>From</th>
           <th></th>
@@ -271,6 +277,9 @@
         <tr>
           <%% } %>
           <%% var date = new Date(email.get('date') * 1000) %>
+          <% unless current_user.secondary_users.empty? %>
+              <td><%%= email.get('email') %></td>
+          <% end %>
           <td><%%= date.toLocaleString() %></td>
           <td><%%= email.get('from') %></td>
           <td>
