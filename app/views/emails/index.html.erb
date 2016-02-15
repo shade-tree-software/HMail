@@ -35,6 +35,9 @@
           <td>
             <ul class="list-style: none">
               <%% var date = new Date(email.get('date') * 1000) %>
+              <% unless current_user.secondary_users.empty? %>
+                  <li>User: <%%= email.get('email') %></li>
+              <% end %>
               <li>Date: <%%= date.toLocaleString() %></li>
               <li>From: <%%= email.get('from') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
@@ -49,6 +52,9 @@
       <table>
         <thead>
         <tr>
+          <% unless current_user.secondary_users.empty? %>
+              <th>User</th>
+          <% end %>
           <th>Date</th>
           <th>From</th>
           <th>Subject</th>
@@ -63,6 +69,9 @@
         <tr>
           <%% } %>
           <%% var date = new Date(email.get('date') * 1000) %>
+          <% unless current_user.secondary_users.empty? %>
+              <td><%%= email.get('email') %></td>
+          <% end %>
           <td><%%= date.toLocaleString() %></td>
           <td><%%= email.get('from') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
@@ -157,6 +166,9 @@
           <td>
             <ul class="list-style: none">
               <%% var date = new Date(email.get('date') * 1000) %>
+              <% unless current_user.secondary_users.empty? %>
+                  <li>User: <%%= email.get('email') %></li>
+              <% end %>
               <li>Date: <%%= date.toLocaleString() %></li>
               <li>From: <%%= email.get('from') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
@@ -171,6 +183,9 @@
       <table>
         <thead>
         <tr>
+          <% unless current_user.secondary_users.empty? %>
+              <th>User</th>
+          <% end %>
           <th>Date</th>
           <th>From</th>
           <th>Subject</th>
@@ -181,6 +196,9 @@
         <%% _.each(emails, function(email) { %>
         <tr>
           <%% var date = new Date(email.get('date') * 1000) %>
+          <% unless current_user.secondary_users.empty? %>
+              <td><%%= email.get('email') %></td>
+          <% end %>
           <td><%%= date.toLocaleString() %></td>
           <td><%%= email.get('from') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
@@ -268,165 +286,165 @@
 
   <script>
 
-      (function () {
+    (function () {
 
-          var EmailCollection = Backbone.Collection.extend({
-              url: '/emails'
-          });
+      var EmailCollection = Backbone.Collection.extend({
+        url: '/emails'
+      });
 
-          var inboxEmails = new EmailCollection();
-          var sentEmails = new EmailCollection();
-          var archivedEmails = new EmailCollection();
-          var unapprovedEmails = new EmailCollection();
+      var inboxEmails = new EmailCollection();
+      var sentEmails = new EmailCollection();
+      var archivedEmails = new EmailCollection();
+      var unapprovedEmails = new EmailCollection();
 
-          var lastConnectTime = new Date(0);
+      var lastConnectTime = new Date(0);
 
-          var onFailure = function () {
-          };
-          var onSuccess = function () {
-              lastConnectTime = new Date();
-              $(".server-alert").each(function (index, elem) {
-                  $(elem).html("").removeClass("alert-box");
+      var onFailure = function () {
+      };
+      var onSuccess = function () {
+        lastConnectTime = new Date();
+        $(".server-alert").each(function (index, elem) {
+          $(elem).html("").removeClass("alert-box");
+        });
+      };
+
+      var updateEmailCount = function (selectorText, mailboxType, emails) {
+        var unreadCount = 0;
+        _.each(emails, function (email) {
+          if (email.get('unread')) {
+            unreadCount++;
+          }
+        });
+        var $elem = $(selectorText);
+        var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
+        $elem.each(function (index, elem) {
+          var newTitle;
+          if (unreadCount > 0) {
+            newTitle = $(elem).html().replace(regex, mailboxType + " (" + unreadCount + ")");
+            $(elem).css('font-weight', 'bold');
+          } else {
+            newTitle = mailboxType;
+            $(elem).css('font-weight', 'normal');
+          }
+          $(elem).html(newTitle);
+        });
+      };
+
+      var InboxView = Backbone.View.extend({
+        el: '.inbox',
+        render: function () {
+          var that = this;
+          inboxEmails.fetch({
+            data: {
+              mailbox_type: 'inbox'
+            },
+            success: function (emails) {
+              onSuccess();
+              var template = _.template($('#inbox-template').html(), {
+                that: this,
+                emails: emails.models
               });
-          };
+              updateEmailCount(".inbox-title", "Inbox", emails.models);
+              that.$el.html(template);
+              $(document).foundation('tab', 'reflow');
+            },
+            error: onFailure()
+          })
+        }
+      });
 
-          var updateEmailCount = function (selectorText, mailboxType, emails) {
-              var unreadCount = 0;
-              _.each(emails, function (email) {
-                  if (email.get('unread')) {
-                      unreadCount++;
-                  }
+      var SentView = Backbone.View.extend({
+        el: '.sent',
+        render: function () {
+          var that = this;
+          sentEmails.fetch({
+            data: {
+              mailbox_type: 'sent'
+            },
+            success: function (emails) {
+              onSuccess();
+              var template = _.template($('#sent-template').html(), {
+                that: this,
+                emails: emails.models
               });
-              var $elem = $(selectorText);
-              var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
-              $elem.each(function (index, elem) {
-                  var newTitle;
-                  if (unreadCount > 0) {
-                      newTitle = $(elem).html().replace(regex, mailboxType + " (" + unreadCount + ")");
-                      $(elem).css('font-weight', 'bold');
-                  } else {
-                      newTitle = mailboxType;
-                      $(elem).css('font-weight', 'normal');
-                  }
-                  $(elem).html(newTitle);
+              that.$el.html(template);
+              $(document).foundation('tab', 'reflow');
+            },
+            error: onFailure()
+          })
+        }
+      });
+
+      var ArchivedView = Backbone.View.extend({
+        el: '.archived',
+        render: function () {
+          var that = this;
+          archivedEmails.fetch({
+            data: {
+              mailbox_type: 'archived'
+            },
+            success: function (emails) {
+              onSuccess();
+              var template = _.template($('#archived-template').html(), {
+                that: this,
+                emails: emails.models
               });
-          };
+              that.$el.html(template);
+              $(document).foundation('tab', 'reflow');
+            },
+            error: onFailure()
+          })
+        }
+      });
 
-          var InboxView = Backbone.View.extend({
-              el: '.inbox',
-              render: function () {
-                  var that = this;
-                  inboxEmails.fetch({
-                      data: {
-                          mailbox_type: 'inbox'
-                      },
-                      success: function (emails) {
-                          onSuccess();
-                          var template = _.template($('#inbox-template').html(), {
-                              that: this,
-                              emails: emails.models
-                          });
-                          updateEmailCount(".inbox-title", "Inbox", emails.models);
-                          that.$el.html(template);
-                          $(document).foundation('tab', 'reflow');
-                      },
-                      error: onFailure()
-                  })
-              }
-          });
+      var UnapprovedView = Backbone.View.extend({
+        el: '.unapproved',
+        render: function () {
+          var that = this;
+          unapprovedEmails.fetch({
+            data: {
+              mailbox_type: 'unapproved'
+            },
+            success: function (emails) {
+              onSuccess();
+              var template = _.template($('#unapproved-template').html(), {
+                that: this,
+                emails: emails.models
+              });
+              updateEmailCount(".unapproved-title", "Unapproved", emails.models);
+              that.$el.html(template);
+              $(document).foundation('tab', 'reflow');
+            },
+            error: onFailure()
+          })
+        }
+      });
 
-          var SentView = Backbone.View.extend({
-              el: '.sent',
-              render: function () {
-                  var that = this;
-                  sentEmails.fetch({
-                      data: {
-                          mailbox_type: 'sent'
-                      },
-                      success: function (emails) {
-                          onSuccess();
-                          var template = _.template($('#sent-template').html(), {
-                              that: this,
-                              emails: emails.models
-                          });
-                          that.$el.html(template);
-                          $(document).foundation('tab', 'reflow');
-                      },
-                      error: onFailure()
-                  })
-              }
-          });
+      var inboxView = new InboxView();
+      var sentView = new SentView();
+      var archivedView = new ArchivedView();
+      var unapprovedView = new UnapprovedView();
 
-          var ArchivedView = Backbone.View.extend({
-              el: '.archived',
-              render: function () {
-                  var that = this;
-                  archivedEmails.fetch({
-                      data: {
-                          mailbox_type: 'archived'
-                      },
-                      success: function (emails) {
-                          onSuccess();
-                          var template = _.template($('#archived-template').html(), {
-                              that: this,
-                              emails: emails.models
-                          });
-                          that.$el.html(template);
-                          $(document).foundation('tab', 'reflow');
-                      },
-                      error: onFailure()
-                  })
-              }
-          });
+      var pop = function () {
+        $.get("/emails/refresh").fail(onFailure).success(onSuccess);
+      };
 
-          var UnapprovedView = Backbone.View.extend({
-              el: '.unapproved',
-              render: function () {
-                  var that = this;
-                  unapprovedEmails.fetch({
-                      data: {
-                          mailbox_type: 'unapproved'
-                      },
-                      success: function (emails) {
-                          onSuccess();
-                          var template = _.template($('#unapproved-template').html(), {
-                              that: this,
-                              emails: emails.models
-                          });
-                          updateEmailCount(".unapproved-title", "Unapproved", emails.models);
-                          that.$el.html(template);
-                          $(document).foundation('tab', 'reflow');
-                      },
-                      error: onFailure()
-                  })
-              }
-          });
+      var renderAll = function () {
+        if (lastConnectTime.getTime() + 30000 < new Date().getTime()) {
+          $(".server-alert").html("Unable to connect to server.  Retrying...").addClass("alert-box");
+        }
+        inboxView.render();
+        sentView.render();
+        archivedView.render();
+        unapprovedView.render();
+      };
 
-          var inboxView = new InboxView();
-          var sentView = new SentView();
-          var archivedView = new ArchivedView();
-          var unapprovedView = new UnapprovedView();
+      pop();
+      renderAll();
+      setInterval(pop, 60000);
+      setInterval(renderAll, 15000);
 
-          var pop = function () {
-              $.get("/emails/refresh").fail(onFailure).success(onSuccess);
-          };
-
-          var renderAll = function(){
-              if (lastConnectTime.getTime() + 30000 < new Date().getTime()) {
-                  $(".server-alert").html("Unable to connect to server.  Retrying...").addClass("alert-box");
-              }
-              inboxView.render();
-              sentView.render();
-              archivedView.render();
-              unapprovedView.render();
-          };
-
-          pop();
-          renderAll();
-          setInterval(pop, 60000);
-          setInterval(renderAll, 15000);
-
-      }());
+    }());
 
   </script>
 </div>

@@ -6,6 +6,7 @@ class Email < ActiveRecord::Base
   attr_accessor :message
 
   def self.sync_mailbox(user, mailbox_type)
+    user_ids = [user.id] + user.secondary_users.map { |s| s.id }
     case mailbox_type
       when 'sent'
         Email.select(:id, :to, :subject, :date)
@@ -13,11 +14,20 @@ class Email < ActiveRecord::Base
             .where(sent: true)
             .order(date: :desc)
       when 'archived'
-        Email.select(:id, :from, :subject, :date)
-            .where(user_id: user.id)
-            .where("\"from\" in (?)", user.friends.select(:email))
-            .where(archived: true)
-            .order(date: :desc)
+        if user.allow_unapproved
+          Email.joins(:user).select(:id, :email, :from, :subject, :date)
+              .where(user_id: user_ids)
+              .where(deleted: [false, nil])
+              .where(archived: true)
+              .order(date: :desc)
+        else
+          Email.joins(:user).select(:id, :email, :from, :subject, :date)
+              .where(user_id: user_ids)
+              .where("\"from\" in (?)", user.friends.select(:email))
+              .where(deleted: [false, nil])
+              .where(archived: true)
+              .order(date: :desc)
+        end
       when 'unapproved'
         if user.allow_unapproved
           nil
@@ -40,18 +50,19 @@ class Email < ActiveRecord::Base
         end
       else # inbox
         if user.allow_unapproved
-          Email.select(:id, :from, :subject, :date, :unread)
-              .where(user_id: user.id)
+          Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+              .where(user_id: user_ids)
               .where(archived: false)
               .where(sent: false)
               .where(deleted: [false, nil])
               .order(date: :desc)
         else
-          Email.select(:id, :from, :subject, :date, :unread)
-              .where(user_id: user.id)
+          Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+              .where(user_id: user_ids)
               .where("\"from\" in (?)", user.friends.select(:email))
               .where(archived: false)
               .where(sent: false)
+              .where(deleted: [false, nil])
               .order(date: :desc)
         end
     end
