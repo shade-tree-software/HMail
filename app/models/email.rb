@@ -21,17 +21,15 @@ class Email < ActiveRecord::Base
                 .where(user_id: u.id)
                 .where(deleted: [false, nil])
                 .where(archived: true)
-                .order(date: :desc)
           else
             Email.joins(:user).select(:id, :email, :from, :subject, :date)
                 .where(user_id: u.id)
                 .where("\"from\" in (?)", u.friends.select(:email))
                 .where(deleted: [false, nil])
                 .where(archived: true)
-                .order(date: :desc)
           end
         end
-        emails.flatten.compact.sort { |x, y| y.date <=> x.date }
+        emails.flatten.compact.sort { |x, y| y.date <=> x.date }.each {|e| e.email.gsub!('@gmail.com','')}
       when 'unapproved'
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -52,10 +50,9 @@ class Email < ActiveRecord::Base
                 .where("\"from\" not in (?)", u.friends.select(:email))
                 .where(sent: false)
                 .where(deleted: [false, nil])
-                .order(date: :desc)
           end
         end
-        emails.flatten.compact.sort { |x, y| y.date <=> x.date }
+        emails.flatten.compact.sort { |x, y| y.date <=> x.date }.each {|e| e.email.gsub!('@gmail.com','')}
       else # inbox
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -65,7 +62,6 @@ class Email < ActiveRecord::Base
                 .where(archived: false)
                 .where(sent: false)
                 .where(deleted: [false, nil])
-                .order(date: :desc)
           else
             Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
                 .where(user_id: u.id)
@@ -73,10 +69,9 @@ class Email < ActiveRecord::Base
                 .where(archived: false)
                 .where(sent: false)
                 .where(deleted: [false, nil])
-                .order(date: :desc)
           end
         end
-        emails.flatten.compact.sort { |x, y| y.date <=> x.date }
+        emails.flatten.compact.sort { |x, y| y.date <=> x.date }.each {|e| e.email.gsub!('@gmail.com','')}
     end
   end
 
