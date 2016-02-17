@@ -9,7 +9,7 @@ class Email < ActiveRecord::Base
     user_ids = [user.id] + user.secondary_users.map { |s| s.id }
     case mailbox_type
       when 'sent'
-        Email.select(:id, :to, :subject, :date)
+        Email.select(:id, :recipients, :subject, :date)
             .where(user_id: user.id)
             .where(sent: true)
             .order(date: :desc)
@@ -17,14 +17,14 @@ class Email < ActiveRecord::Base
         users = [user] + user.secondary_users
         emails = users.map do |u|
           if u.allow_unapproved
-            Email.joins(:user).select(:id, :email, :from, :subject, :date)
+            Email.joins(:user).select(:id, :email, :sender, :subject, :date)
                 .where(user_id: u.id)
                 .where(deleted: [false, nil])
                 .where(archived: true)
           else
-            Email.joins(:user).select(:id, :email, :from, :subject, :date)
+            Email.joins(:user).select(:id, :email, :sender, :subject, :date)
                 .where(user_id: u.id)
-                .where("\"from\" in (?)", u.friends.select(:email))
+                .where("\"sender\" in (?)", u.friends.select(:email))
                 .where(deleted: [false, nil])
                 .where(archived: true)
           end
@@ -37,7 +37,7 @@ class Email < ActiveRecord::Base
             nil
           else
             deleteables = Email.where(user_id: u.id)
-                              .where("\"from\" not in (?)", u.friends.select(:email))
+                              .where("\"sender\" not in (?)", u.friends.select(:email))
                               .where(sent: false)
                               .where(deleted: [false, nil])
                               .where("date < #{Time.now.to_i - 604800}")
@@ -45,9 +45,9 @@ class Email < ActiveRecord::Base
               d[:deleted] = true
               d.save
             end
-            Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+            Email.joins(:user).select(:id, :email, :sender, :subject, :date, :unread)
                 .where(user_id: u.id)
-                .where("\"from\" not in (?)", u.friends.select(:email))
+                .where("\"sender\" not in (?)", u.friends.select(:email))
                 .where(sent: false)
                 .where(deleted: [false, nil])
           end
@@ -57,15 +57,15 @@ class Email < ActiveRecord::Base
         users = [user] + user.secondary_users
         emails = users.map do |u|
           if u.allow_unapproved
-            Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+            Email.joins(:user).select(:id, :email, :sender, :subject, :date, :unread)
                 .where(user_id: u.id)
                 .where(archived: false)
                 .where(sent: false)
                 .where(deleted: [false, nil])
           else
-            Email.joins(:user).select(:id, :email, :from, :subject, :date, :unread)
+            Email.joins(:user).select(:id, :email, :sender, :subject, :date, :unread)
                 .where(user_id: u.id)
-                .where("\"from\" in (?)", u.friends.select(:email))
+                .where("\"sender\" in (?)", u.friends.select(:email))
                 .where(archived: false)
                 .where(sent: false)
                 .where(deleted: [false, nil])
@@ -112,7 +112,7 @@ class Email < ActiveRecord::Base
   end
 
   def build_reply(current_user)
-    orig_recipients = (to.delete(' ').split(',') << from) - [current_user.email]
+    orig_recipients = (recipients.delete(' ').split(',') << sender) - [current_user.email]
     friendly_emails = current_user.friends.map { |f| f.email }
     friendly_ids = current_user.friends.map { |f| f.id }
     recipients = orig_recipients.select { |r| friendly_emails.include? r }
@@ -123,7 +123,7 @@ class Email < ActiveRecord::Base
     original_lines = text(text_only: true).split("\n").collect do |line|
       "> #{line}"
     end
-    preamble = original_lines.empty? ? '' : "\n\nOn #{Time.at(date).utc.to_s} #{from} wrote: \n"
+    preamble = original_lines.empty? ? '' : "\n\nOn #{Time.at(date).utc.to_s} #{sender} wrote: \n"
     reply_text = preamble + original_lines.join("\n")
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject

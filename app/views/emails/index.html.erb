@@ -39,7 +39,7 @@
                   <li>User: <%%= email.get('email') %></li>
               <% end %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>From: <%%= email.get('from') %></li>
+              <li>From: <%%= email.get('sender') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
             </ul>
           </td>
@@ -73,7 +73,7 @@
               <td><%%= email.get('email') %></td>
           <% end %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('from') %></td>
+          <td><%%= email.get('sender') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
         </tr>
         <%% }); %>
@@ -108,7 +108,7 @@
             <ul class="list-style: none">
               <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>To: <%%= email.get('to') %></li>
+              <li>To: <%%= email.get('recipients') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
             </ul>
           </td>
@@ -132,7 +132,7 @@
         <tr>
           <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('to') %></td>
+          <td><%%= email.get('recipients') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
         </tr>
         <%% }); %>
@@ -170,7 +170,7 @@
                   <li>User: <%%= email.get('email') %></li>
               <% end %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>From: <%%= email.get('from') %></li>
+              <li>From: <%%= email.get('sender') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
             </ul>
           </td>
@@ -200,7 +200,7 @@
               <td><%%= email.get('email') %></td>
           <% end %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('from') %></td>
+          <td><%%= email.get('sender') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
         </tr>
         <%% }); %>
@@ -245,7 +245,7 @@
                   <li>User: <%%= email.get('email') %></li>
               <% end %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>From: <%%= email.get('from') %></li>
+              <li>From: <%%= email.get('sender') %></li>
               <li>
                 <a href="/emails/<%%=email.get('id')%>" data-method="delete" data-confirm="Are you sure you want to delete this message?" class="tiny round button">Delete</a>
               </li>
@@ -281,7 +281,7 @@
               <td><%%= email.get('email') %></td>
           <% end %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('from') %></td>
+          <td><%%= email.get('sender') %></td>
           <td>
             <a href="/emails/<%%=email.get('id')%>" data-method="delete" data-confirm="Are you sure you want to delete this message?" class="tiny round button">Delete</a>
           </td>

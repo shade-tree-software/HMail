@@ -21,11 +21,11 @@
     </div>
 
     <div class="field row">
-      <%= f.label :to %>
+      <%= f.label :recipients %>
       <% if @params[:allow_unapproved] %>
-          <%= f.text_field :to, :value => @params[:recipients], required: true %>
+          <%= f.text_field :recipients, :value => @params[:recipients], required: true %>
       <% else %>
-          <%= f.select(:to,
+          <%= f.select(:recipients,
                        options_for_select(@params[:friends], @params[:recipients]),
                        {},
                        {multiple: true, style: 'height: auto', required: true}) %>

@@ -61,11 +61,11 @@ class EmailsController < ApplicationController
                               :enable_starttls_auto => true}
     end
     if current_user.allow_unapproved
-      recipients = params[:email][:to].delete(' ').split(/,|;/)
+      recipients = params[:email][:recipients].delete(' ').split(/,|;/)
     else
-      # reject any items from the to select that are blank,
+      # reject any items from the recipients select that are blank,
       # then map the rest to friend email addresses
-      recipients = params[:email][:to].reject { |r| r.empty? }.map do |recipient|
+      recipients = params[:email][:recipients].reject { |r| r.empty? }.map do |recipient|
         Friend.find(recipient.to_i).email
       end
     end
@@ -91,8 +91,8 @@ class EmailsController < ApplicationController
                        :user_id => current_user.id,
                        :archived => false,
                        :sent => true,
-                       :to => recipients.join(', '),
-                       :from => sender,
+                       :recipients => recipients.join(', '),
+                       :sender => sender,
                        :subject => subj,
                        :date => mail.date.to_i,
                        :deleted => false)
