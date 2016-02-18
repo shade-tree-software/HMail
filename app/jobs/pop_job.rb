@@ -28,11 +28,19 @@ class PopJob < ActiveJob::Base
         mails = [mails] unless mails.is_a? Array
         mails.each do |mail|
           begin
+            subject = mail.subject || '(no subject)'
+            recipients = ((mail.to || []) + (mail.cc || [])).join(', ')
+            sender = mail.from.first
+            if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
+              subject = Email.encrypt_subject(subject)
+              recipients = Email.encrypt_recipients(recipients)
+              sender = Email.encrypt_sender(sender)
+            end
             Email.find_or_create_by(
                 user_id: user.id,
-                subject: mail.subject || '(no subject)',
-                recipients: ((mail.to || []) + (mail.cc || [])).join(', '),
-                sender: mail.from.first,
+                encrypted_subject: subject,
+                encrypted_recipients: recipients,
+                encrypted_sender: sender,
                 date: mail.date.to_i) do |new_email|
               new_email.body = mail.to_s
               new_email.archived = false
