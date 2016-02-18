@@ -5,7 +5,7 @@
 
 <script>
     (function () {
-        var interval = 1000 * 60 * 5; // every five minutes
+        var interval = 1000 * 60 * <%= @period || 5 %>; // every five minutes by default
         setInterval(function () {
             jQuery.get("/emails/refresh_all", function () {
                 t = new Date();

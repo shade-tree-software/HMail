@@ -137,7 +137,7 @@ class EmailsController < ApplicationController
   end
 
   def auto_refresh
-
+    @period = params[:period] # minutes
   end
 
   def image
