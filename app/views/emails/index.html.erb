@@ -34,10 +34,10 @@
           <%% } %>
           <td>
             <ul class="list-style: none">
-              <%% var date = new Date(email.get('date') * 1000) %>
               <% unless current_user.secondary_users.empty? %>
-                  <li>User: <%%= email.get('email') %></li>
+                  <li>User: <%%= email.get('user') %></li>
               <% end %>
+              <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
               <li>From: <%%= email.get('sender') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
@@ -68,10 +68,10 @@
           <%% } else { %>
         <tr>
           <%% } %>
-          <%% var date = new Date(email.get('date') * 1000) %>
           <% unless current_user.secondary_users.empty? %>
-              <td><%%= email.get('email') %></td>
+              <td><%%= email.get('user') %></td>
           <% end %>
+          <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
           <td><%%= email.get('sender') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
@@ -165,10 +165,10 @@
         <tr>
           <td>
             <ul class="list-style: none">
-              <%% var date = new Date(email.get('date') * 1000) %>
               <% unless current_user.secondary_users.empty? %>
-                  <li>User: <%%= email.get('email') %></li>
+                  <li>User: <%%= email.get('user') %></li>
               <% end %>
+              <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
               <li>From: <%%= email.get('sender') %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
@@ -195,10 +195,10 @@
         <tbody>
         <%% _.each(emails, function(email) { %>
         <tr>
-          <%% var date = new Date(email.get('date') * 1000) %>
           <% unless current_user.secondary_users.empty? %>
-              <td><%%= email.get('email') %></td>
+              <td><%%= email.get('user') %></td>
           <% end %>
+          <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
           <td><%%= email.get('sender') %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
@@ -240,10 +240,10 @@
           <%% } %>
           <td>
             <ul class="list-style: none">
-              <%% var date = new Date(email.get('date') * 1000) %>
               <% unless current_user.secondary_users.empty? %>
-                  <li>User: <%%= email.get('email') %></li>
+                  <li>User: <%%= email.get('user') %></li>
               <% end %>
+              <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
               <li>From: <%%= email.get('sender') %></li>
               <li>
@@ -276,10 +276,10 @@
           <%% } else { %>
         <tr>
           <%% } %>
-          <%% var date = new Date(email.get('date') * 1000) %>
           <% unless current_user.secondary_users.empty? %>
-              <td><%%= email.get('email') %></td>
+              <td><%%= email.get('user') %></td>
           <% end %>
+          <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
           <td><%%= email.get('sender') %></td>
           <td>

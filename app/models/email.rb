@@ -5,31 +5,58 @@ class Email < ActiveRecord::Base
 
   attr_accessor :message
 
+  attr_encrypted :sender, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
+  attr_encrypted :recipients, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
+  attr_encrypted :subject, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
+  attr_encrypted :body, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
+
+  def self.friendly_emails(user)
+    if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
+      user.friends.select(:email).map { |friend| Email.encrypt_sender(friend.email) }
+    else
+      user.friends.select(:email)
+    end
+  end
+
   def self.sync_mailbox(user, mailbox_type)
-    user_ids = [user.id] + user.secondary_users.map { |s| s.id }
     case mailbox_type
       when 'sent'
-        Email.select(:id, :recipients, :subject, :date)
+        Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
             .where(user_id: user.id)
             .where(sent: true)
-            .order(date: :desc)
+            .map do |e|
+          {
+              id: e.id,
+              recipients: e.recipients,
+              subject: e.subject,
+              date: e.date
+          }
+        end.sort { |x, y| y[:date] <=> x[:date] }
       when 'archived'
         users = [user] + user.secondary_users
         emails = users.map do |u|
           if u.allow_unapproved
-            Email.joins(:user).select(:id, :email, :sender, :subject, :date)
+            Email.joins(:user).select(:id, :encrypted_sender, :encrypted_subject, :date, :email)
                 .where(user_id: u.id)
                 .where(deleted: [false, nil])
                 .where(archived: true)
           else
-            Email.joins(:user).select(:id, :email, :sender, :subject, :date)
+            Email.joins(:user).select(:id, :encrypted_sender, :encrypted_subject, :date, :email)
                 .where(user_id: u.id)
-                .where("\"sender\" in (?)", u.friends.select(:email))
+                .where(encrypted_sender: friendly_emails(u))
                 .where(deleted: [false, nil])
                 .where(archived: true)
           end
         end
-        emails.flatten.compact.sort { |x, y| y.date <=> x.date }.each {|e| e.email.gsub!('@gmail.com','')}
+        emails.flatten.compact.map do |e|
+          {
+              id: e.id,
+              sender: e.sender,
+              subject: e.subject,
+              date: e.date,
+              user: e.email.gsub!('@gmail.com','')
+          }
+        end.sort { |x, y| y[:date] <=> x[:date] }
       when 'unapproved'
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -37,7 +64,7 @@ class Email < ActiveRecord::Base
             nil
           else
             deleteables = Email.where(user_id: u.id)
-                              .where("\"sender\" not in (?)", u.friends.select(:email))
+                              .where.not(encrypted_sender: friendly_emails(u))
                               .where(sent: false)
                               .where(deleted: [false, nil])
                               .where("date < #{Time.now.to_i - 604800}")
@@ -45,33 +72,50 @@ class Email < ActiveRecord::Base
               d[:deleted] = true
               d.save
             end
-            Email.joins(:user).select(:id, :email, :sender, :subject, :date, :unread)
+            Email.joins(:user).select(:id, :encrypted_sender, :date, :unread, :email)
                 .where(user_id: u.id)
-                .where("\"sender\" not in (?)", u.friends.select(:email))
+                .where.not(encrypted_sender: friendly_emails(u))
                 .where(sent: false)
                 .where(deleted: [false, nil])
           end
         end
-        emails.flatten.compact.sort { |x, y| y.date <=> x.date }.each {|e| e.email.gsub!('@gmail.com','')}
+        emails.flatten.compact.map do |e|
+          {
+              id: e.id,
+              sender: e.sender,
+              date: e.date,
+              unread: e.unread,
+              user: e.email.gsub!('@gmail.com','')
+          }
+        end.sort { |x, y| y[:date] <=> x[:date] }
       else # inbox
         users = [user] + user.secondary_users
         emails = users.map do |u|
           if u.allow_unapproved
-            Email.joins(:user).select(:id, :email, :sender, :subject, :date, :unread)
+            Email.joins(:user).select(:id, :encrypted_sender, :encrypted_subject, :date, :unread, :email)
                 .where(user_id: u.id)
                 .where(archived: false)
                 .where(sent: false)
                 .where(deleted: [false, nil])
           else
-            Email.joins(:user).select(:id, :email, :sender, :subject, :date, :unread)
+            Email.joins(:user).select(:id, :encrypted_sender, :encrypted_subject, :date, :unread, :email)
                 .where(user_id: u.id)
-                .where("\"sender\" in (?)", u.friends.select(:email))
+                .where(encrypted_sender: friendly_emails(u))
                 .where(archived: false)
                 .where(sent: false)
                 .where(deleted: [false, nil])
           end
         end
-        emails.flatten.compact.sort { |x, y| y.date <=> x.date }.each {|e| e.email.gsub!('@gmail.com','')}
+        emails.flatten.compact.map do |e|
+          {
+              id: e.id,
+              sender: e.sender,
+              subject: e.subject,
+              date: e.date,
+              unread: e.unread,
+              user: e.email.gsub!('@gmail.com','')
+          }
+        end.sort { |x, y| y[:date] <=> x[:date] }
     end
   end
 

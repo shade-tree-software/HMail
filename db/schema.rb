@@ -11,27 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160217002557) do
+ActiveRecord::Schema.define(version: 20160217011142) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "emails", force: :cascade do |t|
-    t.string   "body"
+    t.string   "encrypted_body"
     t.integer  "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
     t.boolean  "archived"
     t.boolean  "sent"
-    t.string   "subject"
-    t.string   "recipients"
-    t.string   "sender"
+    t.string   "encrypted_subject"
+    t.string   "encrypted_recipients"
+    t.string   "encrypted_sender"
     t.integer  "date"
     t.boolean  "unread"
     t.boolean  "deleted"
   end
 
-  add_index "emails", ["user_id", "subject", "recipients", "sender", "date"], name: "emails_user_id_subject_to_from_date_key", unique: true, using: :btree
+  add_index "emails", ["user_id", "encrypted_subject", "encrypted_recipients", "encrypted_sender", "date"], name: "emails_user_id_subject_to_from_date_key", unique: true, using: :btree
 
   create_table "friends", force: :cascade do |t|
     t.string   "first_name"
