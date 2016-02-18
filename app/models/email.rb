@@ -27,8 +27,8 @@ class Email < ActiveRecord::Base
             .map do |e|
           {
               id: e.id,
-              recipients: e.recipients,
-              subject: e.subject,
+              recipients: truncate(e.recipients),
+              subject: truncate(e.subject),
               date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
@@ -51,8 +51,8 @@ class Email < ActiveRecord::Base
         emails.flatten.compact.map do |e|
           {
               id: e.id,
-              sender: e.sender,
-              subject: e.subject,
+              sender: truncate(e.sender),
+              subject: truncate(e.subject),
               date: e.date,
               user: e.email.gsub!('@gmail.com','')
           }
@@ -82,7 +82,7 @@ class Email < ActiveRecord::Base
         emails.flatten.compact.map do |e|
           {
               id: e.id,
-              sender: e.sender,
+              sender: truncate(e.sender),
               date: e.date,
               unread: e.unread,
               user: e.email.gsub!('@gmail.com','')
@@ -109,8 +109,8 @@ class Email < ActiveRecord::Base
         emails.flatten.compact.map do |e|
           {
               id: e.id,
-              sender: e.sender,
-              subject: e.subject,
+              sender: truncate(e.sender),
+              subject: truncate(e.subject),
               date: e.date,
               unread: e.unread,
               user: e.email.gsub!('@gmail.com','')
