@@ -5,9 +5,9 @@ class PopJob < ActiveJob::Base
 
   def perform(user_id, count = 5)
     user = User.find(user_id)
-    unless user.email == 'none@nowhere.com' || user.email == 'guest@nowhere.none'
+    if user.email.end_with? '@gmail.com'
       user_name = user.email
-      puts "Performing PopJob on #{user_name}, requesting #{count} #{'email'.pluralize(count)}."
+      puts "Performing PopJob on #{user_name.gsub!('@gmail.com','')}, requesting #{count} #{'email'.pluralize(count)}."
       password = user.email_pw
       Mail.defaults do
         retriever_method :pop3,
@@ -62,6 +62,8 @@ class PopJob < ActiveJob::Base
           end
         end
       end
+    else
+      puts "PopJob is ignoring #{user.email} because it is not a gmail address"
     end
   end
 
