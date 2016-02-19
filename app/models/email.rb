@@ -18,6 +18,12 @@ class Email < ActiveRecord::Base
     end
   end
 
+  def self.truncate(string, len=30)
+    if string.length > len
+      string.slice(0, len).rstrip + '...'
+    end
+  end
+
   def self.sync_mailbox(user, mailbox_type)
     case mailbox_type
       when 'sent'
@@ -28,7 +34,7 @@ class Email < ActiveRecord::Base
           {
               id: e.id,
               recipients: truncate(e.recipients),
-              subject: truncate(e.subject),
+              subject: e.subject,
               date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
@@ -52,7 +58,7 @@ class Email < ActiveRecord::Base
           {
               id: e.id,
               sender: truncate(e.sender),
-              subject: truncate(e.subject),
+              subject: e.subject,
               date: e.date,
               user: e.email.gsub!('@gmail.com','')
           }
@@ -110,7 +116,7 @@ class Email < ActiveRecord::Base
           {
               id: e.id,
               sender: truncate(e.sender),
-              subject: truncate(e.subject),
+              subject: e.subject,
               date: e.date,
               unread: e.unread,
               user: e.email.gsub!('@gmail.com','')
