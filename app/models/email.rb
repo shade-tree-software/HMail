@@ -19,9 +19,7 @@ class Email < ActiveRecord::Base
   end
 
   def self.truncate(string, len=30)
-    if string.length > len
-      string.slice(0, len).rstrip + '...'
-    end
+    (string.length > len) ? (string.slice(0, len).rstrip + '...') : string
   end
 
   def self.sync_mailbox(user, mailbox_type)
