@@ -22,6 +22,20 @@ class Email < ActiveRecord::Base
     (string.length > len) ? (string.slice(0, len).rstrip + '...') : string
   end
 
+  def self.delete_old_unapproved(user)
+    unless user.allow_unapproved
+      deleteables = Email.where(user: user)
+                        .where.not(encrypted_sender: friendly_emails(user))
+                        .where(sent: false)
+                        .where(deleted: [false, nil])
+                        .where("date < #{Time.now.to_i - 604800}")
+      deleteables.each do |d|
+        d[:deleted] = true
+        d.save
+      end
+    end
+  end
+
   def self.sync_mailbox(user, mailbox_type)
     case mailbox_type
       when 'sent'
@@ -58,7 +72,7 @@ class Email < ActiveRecord::Base
               sender: truncate(e.sender),
               subject: e.subject,
               date: e.date,
-              user: e.email.gsub!('@gmail.com','')
+              user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
       when 'unapproved'
@@ -67,15 +81,6 @@ class Email < ActiveRecord::Base
           if u.allow_unapproved
             nil
           else
-            deleteables = Email.where(user_id: u.id)
-                              .where.not(encrypted_sender: friendly_emails(u))
-                              .where(sent: false)
-                              .where(deleted: [false, nil])
-                              .where("date < #{Time.now.to_i - 604800}")
-            deleteables.each do |d|
-              d[:deleted] = true
-              d.save
-            end
             Email.joins(:user).select(:id, :encrypted_sender, :date, :unread, :email)
                 .where(user_id: u.id)
                 .where.not(encrypted_sender: friendly_emails(u))
@@ -89,7 +94,7 @@ class Email < ActiveRecord::Base
               sender: truncate(e.sender),
               date: e.date,
               unread: e.unread,
-              user: e.email.gsub!('@gmail.com','')
+              user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
       else # inbox
@@ -117,7 +122,7 @@ class Email < ActiveRecord::Base
               subject: e.subject,
               date: e.date,
               unread: e.unread,
-              user: e.email.gsub!('@gmail.com','')
+              user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
     end
