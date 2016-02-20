@@ -7,19 +7,21 @@ class EmailsController < ApplicationController
   skip_before_filter :authenticate_user!, only: [:refresh_all, :auto_refresh]
   before_action :set_email, only: [:show, :edit, :update, :destroy, :archive, :reply]
 
-  respond_to :html, :json
-
   def index
-    emails = Email.sync_mailbox(current_user, params[:mailbox_type])
-    @users = ([current_user.email] + current_user.secondary_users.map {|s| s.email}).join(', ').gsub('@gmail.com','')
-    @users.count(',') == 1 ? @users.sub!(',', ' and') : @users.sub!(/(.*),/, '\1, and')
-    respond_with(emails)
+    respond_to do |format|
+      format.html do
+        @users = ([current_user.email] + current_user.secondary_users.map { |s| s.email }).join(', ').gsub('@gmail.com', '')
+        @users.count(',') == 1 ? @users.sub!(',', ' and') : @users.sub!(/(.*),/, '\1, and')
+      end
+      format.json do
+        render json: Email.sync_mailbox(current_user, params[:mailbox_type], params[:page])
+      end
+    end
   end
 
   def show
     @email.unread = false
     @email.save
-    respond_with(@email)
   end
 
 
@@ -35,14 +37,12 @@ class EmailsController < ApplicationController
             allow_unapproved: current_user.allow_unapproved
         }
     @email = Email.new
-    respond_with(@email)
   end
 
   def reply
     @params = @email.build_reply(current_user)
     @email = Email.new
     render :action => :new
-    #respond_with(@email)
   end
 
   #def edit
@@ -97,7 +97,6 @@ class EmailsController < ApplicationController
                        :date => mail.date.to_i,
                        :deleted => false)
     @email.save
-    respond_with(@email)
   end
 
   #def update

@@ -22,6 +22,13 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <div class="row">
+      <div class="large-8 columns">
+        <button class="<%%= info.page === 1 ? 'disabled' : '' %> tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button class="<%%= info.page === info.pages ? 'disabled' : '' %> tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -298,7 +305,10 @@
     (function () {
 
       var EmailCollection = Backbone.Collection.extend({
-        url: '/emails'
+        url: '/emails',
+        parse: function (response) {
+          return response.emails;
+        }
       });
 
       var inboxEmails = new EmailCollection();
@@ -340,21 +350,38 @@
       };
 
       var InboxView = Backbone.View.extend({
+        pageInfo: {page: 1, pages: 'unknown'},
         el: '.inbox',
+        nextPage: function () {
+          this.update(this.pageInfo.page + 1);
+        },
+        prevPage: function () {
+          this.update(this.pageInfo.page - 1);
+        },
+        events: {
+          "click .nextPage:not(.disabled)": "nextPage",
+          "click .prevPage:not(.disabled)": "prevPage"
+        },
         render: function () {
+          this.update(this.pageInfo.page);
+        },
+        update: function (page) {
           var that = this;
           inboxEmails.fetch({
             data: {
-              mailbox_type: 'inbox'
+              mailbox_type: 'inbox',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#inbox-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
               updateEmailCount(".inbox-title", "Inbox", emails.models);
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()

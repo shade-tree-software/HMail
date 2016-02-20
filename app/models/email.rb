@@ -10,6 +10,8 @@ class Email < ActiveRecord::Base
   attr_encrypted :subject, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
   attr_encrypted :body, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
 
+  EMAILS_PER_PAGE = 3
+
   def self.friendly_emails(user)
     if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
       user.friends.select(:email).map { |friend| Email.encrypt_sender(friend.email) }
@@ -36,13 +38,14 @@ class Email < ActiveRecord::Base
     end
   end
 
-  def self.sync_mailbox(user, mailbox_type)
+  def self.sync_mailbox(user, mailbox_type, page=1)
+    page = page.to_i
     case mailbox_type
       when 'sent'
-        Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
-            .where(user_id: user.id)
-            .where(sent: true)
-            .map do |e|
+        emails = Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
+                     .where(user_id: user.id)
+                     .where(sent: true)
+                     .map do |e|
           {
               id: e.id,
               recipients: truncate(e.recipients),
@@ -50,6 +53,7 @@ class Email < ActiveRecord::Base
               date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
+        {info: {page: page, pages: 10}, emails: emails}
       when 'archived'
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -66,7 +70,7 @@ class Email < ActiveRecord::Base
                 .where(archived: true)
           end
         end
-        emails.flatten.compact.map do |e|
+        emails = emails.flatten.compact.map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -75,6 +79,7 @@ class Email < ActiveRecord::Base
               user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
+        {info: {page: page, pages: 10}, emails: emails}
       when 'unapproved'
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -88,7 +93,7 @@ class Email < ActiveRecord::Base
                 .where(deleted: [false, nil])
           end
         end
-        emails.flatten.compact.map do |e|
+        emails = emails.flatten.compact.map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -97,6 +102,7 @@ class Email < ActiveRecord::Base
               user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
+        {info: {page: page, pages: 10}, emails: emails}
       else # inbox
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -114,8 +120,7 @@ class Email < ActiveRecord::Base
                 .where(sent: false)
                 .where(deleted: [false, nil])
           end
-        end
-        emails.flatten.compact.map do |e|
+        end.flatten.compact.map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -125,6 +130,9 @@ class Email < ActiveRecord::Base
               user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
+        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        {info: {page: page, pages: pages}, emails: emails}
     end
   end
 
