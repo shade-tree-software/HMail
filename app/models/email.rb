@@ -18,7 +18,7 @@ class Email < ActiveRecord::Base
     end
   end
 
-  def self.truncate(string, len=30)
+  def self.truncate(string='', len=30)
     (string.length > len) ? (string.slice(0, len).rstrip + '...') : string
   end
 
