@@ -22,13 +22,15 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
     <div class="row">
       <div class="large-8 columns">
-        <button class="<%%= info.page === 1 ? 'disabled' : '' %> tiny round button prevPage">Previous Page</button>
+        <button type="button" <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
         Page <%%= info.page %> of <%%= info.pages %>
-        <button class="<%%= info.page === info.pages ? 'disabled' : '' %> tiny round button nextPage">Next Page</button>
+        <button type="button" <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
       </div>
     </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -350,7 +352,7 @@
       };
 
       var InboxView = Backbone.View.extend({
-        pageInfo: {page: 1, pages: 'unknown'},
+        pageInfo: {page: 1, pages: 1},
         el: '.inbox',
         nextPage: function () {
           this.update(this.pageInfo.page + 1);
