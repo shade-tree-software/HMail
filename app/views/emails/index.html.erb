@@ -25,9 +25,11 @@
     <%% if (info.pages > 1) { %>
     <div class="row">
       <div class="large-8 columns">
-        <button type="button" <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
         Page <%%= info.page %> of <%%= info.pages %>
-        <button type="button" <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
       </div>
     </div>
     <%% } %>
@@ -107,6 +109,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -351,9 +364,8 @@
         });
       };
 
-      var InboxView = Backbone.View.extend({
+      var MailboxView = Backbone.View.extend({
         pageInfo: {page: 1, pages: 1},
-        el: '.inbox',
         nextPage: function () {
           this.update(this.pageInfo.page + 1);
         },
@@ -366,7 +378,11 @@
         },
         render: function () {
           this.update(this.pageInfo.page);
-        },
+        }
+      });
+
+      var InboxView = MailboxView.extend({
+        el: '.inbox',
         update: function (page) {
           var that = this;
           inboxEmails.fetch({
@@ -391,21 +407,24 @@
         }
       });
 
-      var SentView = Backbone.View.extend({
+      var SentView = MailboxView.extend({
         el: '.sent',
-        render: function () {
+        update: function (page) {
           var that = this;
           sentEmails.fetch({
             data: {
-              mailbox_type: 'sent'
+              mailbox_type: 'sent',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#sent-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()

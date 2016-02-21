@@ -10,7 +10,7 @@ class Email < ActiveRecord::Base
   attr_encrypted :subject, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
   attr_encrypted :body, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
 
-  EMAILS_PER_PAGE = 3
+  EMAILS_PER_PAGE = 8
 
   def self.friendly_emails(user)
     if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
@@ -53,7 +53,9 @@ class Email < ActiveRecord::Base
               date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
-        {info: {page: page, pages: 10}, emails: emails}
+        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        {info: {page: page, pages: pages}, emails: emails}
       when 'archived'
         users = [user] + user.secondary_users
         emails = users.map do |u|
