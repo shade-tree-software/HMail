@@ -179,6 +179,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -247,6 +258,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div data-alert class="alert-box alert">
       These messages will be deleted after one week
@@ -432,21 +454,24 @@
         }
       });
 
-      var ArchivedView = Backbone.View.extend({
+      var ArchivedView = MailboxView.extend({
         el: '.archived',
-        render: function () {
+        update: function (page) {
           var that = this;
           archivedEmails.fetch({
             data: {
-              mailbox_type: 'archived'
+              mailbox_type: 'archived',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#archived-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()
@@ -454,22 +479,25 @@
         }
       });
 
-      var UnapprovedView = Backbone.View.extend({
+      var UnapprovedView = MailboxView.extend({
         el: '.unapproved',
-        render: function () {
+        update: function (page) {
           var that = this;
           unapprovedEmails.fetch({
             data: {
-              mailbox_type: 'unapproved'
+              mailbox_type: 'unapproved',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#unapproved-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
               updateEmailCount(".unapproved-title", "Unapproved", emails.models);
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()

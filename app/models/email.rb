@@ -71,8 +71,7 @@ class Email < ActiveRecord::Base
                 .where(deleted: [false, nil])
                 .where(archived: true)
           end
-        end
-        emails = emails.flatten.compact.map do |e|
+        end.flatten.compact.map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -81,7 +80,9 @@ class Email < ActiveRecord::Base
               user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
-        {info: {page: page, pages: 10}, emails: emails}
+        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        {info: {page: page, pages: pages}, emails: emails}
       when 'unapproved'
         users = [user] + user.secondary_users
         emails = users.map do |u|
@@ -94,8 +95,7 @@ class Email < ActiveRecord::Base
                 .where(sent: false)
                 .where(deleted: [false, nil])
           end
-        end
-        emails = emails.flatten.compact.map do |e|
+        end.flatten.compact.map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -104,7 +104,9 @@ class Email < ActiveRecord::Base
               user: e.email.gsub!('@gmail.com', '')
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
-        {info: {page: page, pages: 10}, emails: emails}
+        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        {info: {page: page, pages: pages}, emails: emails}
       else # inbox
         users = [user] + user.secondary_users
         emails = users.map do |u|
