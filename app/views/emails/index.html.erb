@@ -364,13 +364,7 @@
         });
       };
 
-      var updateEmailCount = function (selectorText, mailboxType, emails) {
-        var unreadCount = 0;
-        _.each(emails, function (email) {
-          if (email.get('unread')) {
-            unreadCount++;
-          }
-        });
+      var updateEmailCount = function (selectorText, mailboxType, unreadCount) {
         var $elem = $(selectorText);
         var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
         $elem.each(function (index, elem) {
@@ -419,7 +413,7 @@
                 emails: emails.models,
                 info: response.info
               });
-              updateEmailCount(".inbox-title", "Inbox", emails.models);
+              updateEmailCount(".inbox-title", "Inbox", response.info.unread);
               that.$el.html(template);
               that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
@@ -495,7 +489,7 @@
                 emails: emails.models,
                 info: response.info
               });
-              updateEmailCount(".unapproved-title", "Unapproved", emails.models);
+              updateEmailCount(".unapproved-title", "Unapproved", response.info.unread);
               that.$el.html(template);
               that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
