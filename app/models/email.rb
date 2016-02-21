@@ -150,6 +150,11 @@ class Email < ActiveRecord::Base
     end
   end
 
+  # wrap http and https urls in <a> tags so the user can click on them
+  def linkify_urls(str)
+    str.gsub(/(?<url>(https?:\/\/)([\da-zA-Z\.-]+)\.([a-z]{2,6}))/, '<a href="\k<url>">\k<url></a>')
+  end
+
   def assemble_parts(part, args)
     if part.multipart?
       part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
@@ -159,7 +164,7 @@ class Email < ActiveRecord::Base
       elsif part.content_type.start_with?('text/html') && !args[:text_only]
         nil
       elsif part.content_type.start_with? 'text/plain'
-        CGI.escapeHTML(part.decoded)
+        linkify_urls(CGI.escapeHTML(part.decoded))
       elsif part.content_type.start_with?('image/') && !args[:text_only]
         @image_count += 1
         Dir.mkdir('media') unless Dir.exists?('media')
