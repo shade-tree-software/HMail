@@ -97,6 +97,7 @@ class EmailsController < ApplicationController
                        :date => mail.date.to_i,
                        :deleted => false)
     @email.save
+    redirect_to emails_url
   end
 
   #def update
