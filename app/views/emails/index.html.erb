@@ -22,6 +22,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -98,6 +109,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -157,6 +179,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div class="show-for-small-only">
       <table>
@@ -225,6 +258,17 @@
         <%= link_to 'Compose Message', new_email_path, :class => 'small round button' %>
       </div>
     </div>
+    <%% if (info.pages > 1) { %>
+    <div class="row">
+      <div class="large-8 columns">
+        <button type="button"
+        <%%= info.page === 1 ? 'disabled' : '' %> class="tiny round button prevPage">Previous Page</button>
+        Page <%%= info.page %> of <%%= info.pages %>
+        <button type="button"
+        <%%= info.page === info.pages ? 'disabled' : '' %> class="tiny round button nextPage">Next Page</button>
+      </div>
+    </div>
+    <%% } %>
     <%% if (emails.length > 0) { %>
     <div data-alert class="alert-box alert">
       These messages will be deleted after one week
@@ -298,7 +342,10 @@
     (function () {
 
       var EmailCollection = Backbone.Collection.extend({
-        url: '/emails'
+        url: '/emails',
+        parse: function (response) {
+          return response.emails;
+        }
       });
 
       var inboxEmails = new EmailCollection();
@@ -317,13 +364,7 @@
         });
       };
 
-      var updateEmailCount = function (selectorText, mailboxType, emails) {
-        var unreadCount = 0;
-        _.each(emails, function (email) {
-          if (email.get('unread')) {
-            unreadCount++;
-          }
-        });
+      var updateEmailCount = function (selectorText, mailboxType, unreadCount) {
         var $elem = $(selectorText);
         var regex = new RegExp(mailboxType + "( \\(\\d+\\))?");
         $elem.each(function (index, elem) {
@@ -339,22 +380,42 @@
         });
       };
 
-      var InboxView = Backbone.View.extend({
-        el: '.inbox',
+      var MailboxView = Backbone.View.extend({
+        pageInfo: {page: 1, pages: 1},
+        nextPage: function () {
+          this.update(this.pageInfo.page + 1);
+        },
+        prevPage: function () {
+          this.update(this.pageInfo.page - 1);
+        },
+        events: {
+          "click .nextPage:not(.disabled)": "nextPage",
+          "click .prevPage:not(.disabled)": "prevPage"
+        },
         render: function () {
+          this.update(this.pageInfo.page);
+        }
+      });
+
+      var InboxView = MailboxView.extend({
+        el: '.inbox',
+        update: function (page) {
           var that = this;
           inboxEmails.fetch({
             data: {
-              mailbox_type: 'inbox'
+              mailbox_type: 'inbox',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#inbox-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
-              updateEmailCount(".inbox-title", "Inbox", emails.models);
+              updateEmailCount(".inbox-title", "Inbox", response.info.unread);
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()
@@ -362,21 +423,24 @@
         }
       });
 
-      var SentView = Backbone.View.extend({
+      var SentView = MailboxView.extend({
         el: '.sent',
-        render: function () {
+        update: function (page) {
           var that = this;
           sentEmails.fetch({
             data: {
-              mailbox_type: 'sent'
+              mailbox_type: 'sent',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#sent-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()
@@ -384,21 +448,24 @@
         }
       });
 
-      var ArchivedView = Backbone.View.extend({
+      var ArchivedView = MailboxView.extend({
         el: '.archived',
-        render: function () {
+        update: function (page) {
           var that = this;
           archivedEmails.fetch({
             data: {
-              mailbox_type: 'archived'
+              mailbox_type: 'archived',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#archived-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()
@@ -406,22 +473,25 @@
         }
       });
 
-      var UnapprovedView = Backbone.View.extend({
+      var UnapprovedView = MailboxView.extend({
         el: '.unapproved',
-        render: function () {
+        update: function (page) {
           var that = this;
           unapprovedEmails.fetch({
             data: {
-              mailbox_type: 'unapproved'
+              mailbox_type: 'unapproved',
+              page: page
             },
-            success: function (emails) {
+            success: function (emails, response) {
               onSuccess();
               var template = _.template($('#unapproved-template').html(), {
                 that: this,
-                emails: emails.models
+                emails: emails.models,
+                info: response.info
               });
-              updateEmailCount(".unapproved-title", "Unapproved", emails.models);
+              updateEmailCount(".unapproved-title", "Unapproved", response.info.unread);
               that.$el.html(template);
+              that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
             },
             error: onFailure()

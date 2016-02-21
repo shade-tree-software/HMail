@@ -6,6 +6,7 @@ class PopJob < ActiveJob::Base
   def perform(user_id, count = 5)
     user = User.find(user_id)
     if user.email.end_with? '@gmail.com'
+      Email.delete_old_unapproved(user)
       user_name = user.email
       puts "Performing PopJob on user_id(#{user_id}), requesting #{count} #{'email'.pluralize(count)}."
       password = user.email_pw
