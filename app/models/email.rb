@@ -152,7 +152,7 @@ class Email < ActiveRecord::Base
 
   # wrap http and https urls in <a> tags so the user can click on them
   def linkify_urls(str)
-    str.gsub(/(?<url>(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-=]*)*\/?)/, '<a href="\k<url>">\k<url></a>')
+    str.gsub(/(?<url>(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-=@_]*)*\/?)/, '<a href="\k<url>">\k<url></a>')
   end
 
   def assemble_parts(part, args)
