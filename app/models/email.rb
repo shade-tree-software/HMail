@@ -38,8 +38,9 @@ class Email < ActiveRecord::Base
     end
   end
 
-  def self.sync_mailbox(user, mailbox_type, page=1)
+  def self.sync_mailbox(user, mailbox_type='inbox', page=1)
     page = page.to_i
+    page = (page < 1) ? 1 : page
     case mailbox_type
       when 'sent'
         emails = Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
