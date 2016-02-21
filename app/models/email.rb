@@ -50,7 +50,7 @@ class Email < ActiveRecord::Base
           {
               id: e.id,
               recipients: truncate(e.recipients),
-              subject: e.subject,
+              subject: CGI.escapeHTML(e.subject),
               date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
@@ -76,7 +76,7 @@ class Email < ActiveRecord::Base
           {
               id: e.id,
               sender: truncate(e.sender),
-              subject: e.subject,
+              subject: CGI.escapeHTML(e.subject),
               date: e.date,
               user: user_names[e.user_id]
           }
@@ -138,7 +138,7 @@ class Email < ActiveRecord::Base
           {
               id: e.id,
               sender: truncate(e.sender),
-              subject: e.subject,
+              subject: CGI.escapeHTML(e.subject),
               date: e.date,
               unread: e.unread,
               user: user_names[e.user_id]
@@ -150,16 +150,21 @@ class Email < ActiveRecord::Base
     end
   end
 
+  # wrap http and https urls in <a> tags so the user can click on them
+  def linkify_urls(str)
+    str.gsub(/(?<url>(https?:\/\/)([\da-zA-Z\.-]+)\.([a-z]{2,6}))/, '<a href="\k<url>">\k<url></a>')
+  end
+
   def assemble_parts(part, args)
     if part.multipart?
       part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
     else
       if part.content_type.nil?
-        part.body.to_s # Not sure if this really works.  We don't seem to handle non-multipart messages correctly.
+        CGI.escapeHTML(part.body.to_s) # Not sure if this really works.  We don't seem to handle non-multipart messages correctly.
       elsif part.content_type.start_with?('text/html') && !args[:text_only]
         nil
       elsif part.content_type.start_with? 'text/plain'
-        part.decoded
+        linkify_urls(CGI.escapeHTML(part.decoded))
       elsif part.content_type.start_with?('image/') && !args[:text_only]
         @image_count += 1
         Dir.mkdir('media') unless Dir.exists?('media')
