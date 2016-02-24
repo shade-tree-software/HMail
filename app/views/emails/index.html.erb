@@ -384,10 +384,14 @@
         var $title = $('title');
         var title = $title.html();
         var countText = '(' + unreadCount + ')';
-        if (title.endsWith(')')){
-          $title.html(title.replace(/\(\d+\)/, countText));
+        if (unreadCount > 0) {
+          if (title.endsWith(')')) {
+            $title.html(title.replace(/\(\d+\)/, countText));
+          } else {
+            $title.html(title + ' ' + countText);
+          }
         } else {
-          $title.html(title + ' ' + countText);
+          $title.html(title.replace(/ \(\d+\)/, ''));
         }
       };
 
