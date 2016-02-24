@@ -380,6 +380,17 @@
         });
       };
 
+      var updateTitleText = function(unreadCount){
+        var $title = $('title');
+        var title = $title.html();
+        var countText = '(' + unreadCount + ')';
+        if (title.endsWith(')')){
+          $title.html(title.replace(/\(\d+\)/, countText));
+        } else {
+          $title.html(title + ' ' + countText);
+        }
+      };
+
       var MailboxView = Backbone.View.extend({
         pageInfo: {page: 1, pages: 1},
         nextPage: function () {
@@ -414,6 +425,7 @@
                 info: response.info
               });
               updateEmailCount(".inbox-title", "Inbox", response.info.unread);
+              updateTitleText(response.info.unread);
               that.$el.html(template);
               that.pageInfo = response.info;
               $(document).foundation('tab', 'reflow');
