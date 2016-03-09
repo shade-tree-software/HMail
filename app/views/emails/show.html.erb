@@ -2,13 +2,13 @@
 <br/>
 
 <script>
-    $(document).ready(function () {
-        var $email_text_elem = $('#email_text');
-        $email_text_elem.html($email_text_elem.html().replace(/\n\r?/g, '<br />'));
-        var $date_elem = $('#date');
-        var date = new Date(parseInt($date_elem.text()) * 1000);
-        $date_elem.text(date.toLocaleString());
-    });
+  $(document).ready(function () {
+    var $email_text_elem = $('#email_text');
+    $email_text_elem.html($email_text_elem.html().replace(/\n\r?/g, '<br />'));
+    var $date_elem = $('#date');
+    var date = new Date(parseInt($date_elem.text()) * 1000);
+    $date_elem.text(date.toLocaleString());
+  });
 </script>
 
 <div class="row">
@@ -24,27 +24,20 @@
 
 <div class="row">
   <p>
+    <% unless current_user.secondary_users.empty? %>
+        <strong>User:</strong>
+        <%= @email.user.email.gsub!('@gmail.com', '') %>
+        <br>
+    <% end %>
     <strong>Date:</strong>
     <span id="date"><%= @email.date %></span>
-  </p>
-</div>
-
-<div class="row">
-  <p>
+    <br>
     <strong>To:</strong>
     <%= @email.recipients %>
-  </p>
-</div>
-
-<div class="row">
-  <p>
+    <br>
     <strong>From:</strong>
     <%= @email.sender %>
-  </p>
-</div>
-
-<div class="row">
-  <p>
+    <br>
     <strong>Subject:</strong>
     <%= @email.subject %>
   </p>
