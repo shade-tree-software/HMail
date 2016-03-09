@@ -141,7 +141,8 @@ class EmailsController < ApplicationController
   end
 
   def image
-    filename = "media/#{current_user.id}_#{params[:id]}_#{params[:filename]}"
+    original_user_id = Email.find(params[:id]).user_id
+    filename = "media/#{original_user_id}_#{params[:id]}_#{params[:filename]}"
     image_data = File.read filename
     File.delete filename
     send_data image_data
