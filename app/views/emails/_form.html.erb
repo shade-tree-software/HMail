@@ -37,7 +37,7 @@
     </div>
     <div class="field row">
       <%= f.label :message %>
-      <%= f.text_area :message, :value => @params[:reply_text], :autofocus => @params[:is_reply] %>
+      <%= f.text_area :message, :value => raw(@params[:reply_text]), :autofocus => @params[:is_reply] %>
     </div>
     <br>
     <div class="field row">
