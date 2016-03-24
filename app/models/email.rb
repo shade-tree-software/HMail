@@ -1,4 +1,5 @@
 require 'friend'
+require 'user'
 
 class Email < ActiveRecord::Base
   belongs_to :user
@@ -11,6 +12,14 @@ class Email < ActiveRecord::Base
   attr_encrypted :body, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
 
   EMAILS_PER_PAGE = 8
+
+  def self.refresh_all
+    User.all.each do |user|
+      unless user.email == 'none@nowhere.com' || user.email == 'guest@nowhere.none'
+        PopJob.perform_later(user.id, 1)
+      end
+    end
+  end
 
   def self.friendly_emails(user)
     if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
