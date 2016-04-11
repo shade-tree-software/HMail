@@ -165,7 +165,7 @@ class Email < ActiveRecord::Base
       elsif part.content_type.start_with?('text/html') && !args[:text_only]
         nil
       elsif part.content_type.start_with? 'text/plain'
-        if :no_links
+        if args[:no_links]
           CGI.escapeHTML(part.decoded)
         else
           linkify_urls(CGI.escapeHTML(part.decoded))
