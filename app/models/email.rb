@@ -27,10 +27,10 @@ class Email < ActiveRecord::Base
   def self.delete_old_unapproved(user)
     unless user.allow_unapproved
       deleteables = Email.where(user: user)
-                        .where.not(encrypted_sender: friendly_emails(user))
-                        .where(sent: false)
-                        .where(deleted: [false, nil])
-                        .where("date < #{Time.now.to_i - 604800}")
+                      .where.not(encrypted_sender: friendly_emails(user))
+                      .where(sent: false)
+                      .where(deleted: [false, nil])
+                      .where("date < #{Time.now.to_i - 604800}")
       deleteables.each do |d|
         d[:deleted] = true
         d.save
@@ -44,14 +44,14 @@ class Email < ActiveRecord::Base
     case mailbox_type
       when 'sent'
         emails = Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
-                     .where(user_id: user.id)
-                     .where(sent: true)
-                     .map do |e|
+                   .where(user_id: user.id)
+                   .where(sent: true)
+                   .map do |e|
           {
-              id: e.id,
-              recipients: truncate(e.recipients),
-              subject: CGI.escapeHTML(e.subject),
-              date: e.date
+            id: e.id,
+            recipients: truncate(e.recipients),
+            subject: CGI.escapeHTML(e.subject),
+            date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -64,21 +64,21 @@ class Email < ActiveRecord::Base
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
             Email.where(user_id: u.id)
-                .where(deleted: [false, nil])
-                .where(archived: true)
+              .where(deleted: [false, nil])
+              .where(archived: true)
           else
             Email.where(user_id: u.id)
-                .where(encrypted_sender: friendly_emails(u))
-                .where(deleted: [false, nil])
-                .where(archived: true)
+              .where(encrypted_sender: friendly_emails(u))
+              .where(deleted: [false, nil])
+              .where(archived: true)
           end
         end.flatten.compact.map do |e|
           {
-              id: e.id,
-              sender: truncate(e.sender),
-              subject: CGI.escapeHTML(e.subject),
-              date: e.date,
-              user: user_names[e.user_id]
+            id: e.id,
+            sender: truncate(e.sender),
+            subject: CGI.escapeHTML(e.subject),
+            date: e.date,
+            user: user_names[e.user_id]
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -94,19 +94,19 @@ class Email < ActiveRecord::Base
             nil
           else
             email_relation = Email.where(user_id: u.id)
-                                 .where.not(encrypted_sender: friendly_emails(u))
-                                 .where(sent: false)
-                                 .where(deleted: [false, nil])
+                               .where.not(encrypted_sender: friendly_emails(u))
+                               .where(sent: false)
+                               .where(deleted: [false, nil])
             unread += email_relation.where(unread: true).count
             email_relation
           end
         end.flatten.compact.map do |e|
           {
-              id: e.id,
-              sender: truncate(e.sender),
-              date: e.date,
-              unread: e.unread,
-              user: user_names[e.user_id]
+            id: e.id,
+            sender: truncate(e.sender),
+            date: e.date,
+            unread: e.unread,
+            user: user_names[e.user_id]
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -120,28 +120,28 @@ class Email < ActiveRecord::Base
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
             email_relation = Email.where(user_id: u.id)
-                                 .where(archived: false)
-                                 .where(sent: false)
-                                 .where(deleted: [false, nil])
+                               .where(archived: false)
+                               .where(sent: false)
+                               .where(deleted: [false, nil])
             unread += email_relation.where(unread: true).count
             email_relation
           else
             email_relation = Email.where(user_id: u.id)
-                                 .where(encrypted_sender: friendly_emails(u))
-                                 .where(archived: false)
-                                 .where(sent: false)
-                                 .where(deleted: [false, nil])
+                               .where(encrypted_sender: friendly_emails(u))
+                               .where(archived: false)
+                               .where(sent: false)
+                               .where(deleted: [false, nil])
             unread += email_relation.where(unread: true).count
             email_relation
           end
         end.flatten.compact.map do |e|
           {
-              id: e.id,
-              sender: truncate(e.sender),
-              subject: CGI.escapeHTML(e.subject),
-              date: e.date,
-              unread: e.unread,
-              user: user_names[e.user_id]
+            id: e.id,
+            sender: truncate(e.sender),
+            subject: CGI.escapeHTML(e.subject),
+            date: e.date,
+            unread: e.unread,
+            user: user_names[e.user_id]
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -152,7 +152,7 @@ class Email < ActiveRecord::Base
 
   # wrap http and https urls in <a> tags so the user can click on them
   def linkify_urls(str)
-    str.gsub(/(?<url>(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.=@_-]*)*\/?)/, '<a href="\k<url>">\k<url></a>')
+    str.gsub(/(?<url>((?:(http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?)/, '<a href="\k<url>">\k<url></a>')
   end
 
   def assemble_parts(part, args)
@@ -164,7 +164,11 @@ class Email < ActiveRecord::Base
       elsif part.content_type.start_with?('text/html') && !args[:text_only]
         nil
       elsif part.content_type.start_with? 'text/plain'
-        linkify_urls(CGI.escapeHTML(part.decoded))
+        if args[:no_links]
+          CGI.escapeHTML(part.decoded)
+        else
+          linkify_urls(CGI.escapeHTML(part.decoded))
+        end
       elsif part.content_type.start_with?('image/') && !args[:text_only]
         @image_count += 1
         Dir.mkdir('media') unless Dir.exists?('media')
@@ -200,7 +204,7 @@ class Email < ActiveRecord::Base
     friends = current_user.friends.map do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
-    original_lines = text(text_only: true).split("\n").collect do |line|
+    original_lines = text({text_only: true, no_links: true}).split("\n").collect do |line|
       "> #{line}"
     end
     preamble = original_lines.empty? ? '' : "\n\nOn #{Time.at(date).utc.to_s} #{sender} wrote: \n"
@@ -208,13 +212,13 @@ class Email < ActiveRecord::Base
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
     {
-        recipients: current_user.allow_unapproved? ? orig_recipients.join(', ') : recipient_ids,
-        friends: friends,
-        subject: new_subject,
-        reply_text: reply_text,
-        is_reply: true,
-        thread_participant_count: orig_recipients.size,
-        allow_unapproved: current_user.allow_unapproved
+      recipients: current_user.allow_unapproved? ? orig_recipients.join(', ') : recipient_ids,
+      friends: friends,
+      subject: new_subject,
+      reply_text: reply_text,
+      is_reply: true,
+      thread_participant_count: orig_recipients.size,
+      allow_unapproved: current_user.allow_unapproved
     }
   end
 
