@@ -1,7 +1,6 @@
 require 'user'
 
-class PopJob < ActiveJob::Base
-  queue_as :default
+class PopJob
 
   def perform(user_id, count = 5)
     user = User.find(user_id)
