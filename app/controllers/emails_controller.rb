@@ -130,7 +130,7 @@ class EmailsController < ApplicationController
   def refresh_all
     User.all.each do |user|
       unless user.email == 'none@nowhere.com' || user.email == 'guest@nowhere.none'
-        PopJob.perform_later(user.id, 1)
+        PopJob.perform(user.id, 1)
       end
     end
     render nothing: true
