@@ -50,12 +50,15 @@ class Email < ActiveRecord::Base
                         .pluck(:id, :date)
                         .sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
+                     .order(date: :desc)
+                     .pluck(:id, :encrypted_recipients, :encrypted_subject, :date)
+                     .map do |e|
           {
-              id: e.id,
-              recipients: truncate(e.recipients),
-              subject: CGI.escapeHTML(e.subject),
-              date: e.date
+              id: e[0],
+              recipients: truncate(e[1]),
+              subject: CGI.escapeHTML(e[2]),
+              date: e[3]
           }
         end
         {info: {page: page, pages: pages}, emails: emails}
@@ -78,13 +81,16 @@ class Email < ActiveRecord::Base
           end
         end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
+                     .order(date: :desc)
+                     .pluck(:id, :encrypted_sender, :encrypted_subject, :date, :user_id)
+                     .map do |e|
           {
-              id: e.id,
-              sender: truncate(e.sender),
-              subject: CGI.escapeHTML(e.subject),
-              date: e.date,
-              user: user_names[e.user_id]
+              id: e[0],
+              sender: truncate(e[1]),
+              subject: CGI.escapeHTML(e[2]),
+              date: e[3],
+              user: user_names[e[4]]
           }
         end
         {info: {page: page, pages: pages}, emails: emails}
@@ -111,13 +117,16 @@ class Email < ActiveRecord::Base
           end
         end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
+                     .order(date: :desc)
+                     .pluck(:id, :encrypted_sender, :date, :unread, :user_id)
+                     .map do |e|
           {
-              id: e.id,
-              sender: truncate(e.sender),
-              date: e.date,
-              unread: e.unread,
-              user: user_names[e.user_id]
+              id: e[0],
+              sender: truncate(e[1]),
+              date: e[2],
+              unread: e[3],
+              user: user_names[e[4]]
           }
         end
         {info: {page: page, pages: pages, unread: unread}, emails: emails}
@@ -156,14 +165,17 @@ class Email < ActiveRecord::Base
           end
         end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
+                     .order(date: :desc)
+                     .pluck(:id, :encrypted_sender, :encrypted_subject, :date, :unread, :user_id)
+                     .map do |e|
           {
-              id: e.id,
-              sender: truncate(e.sender),
-              subject: CGI.escapeHTML(e.subject),
-              date: e.date,
-              unread: e.unread,
-              user: user_names[e.user_id]
+              id: e[0],
+              sender: truncate(e[1]),
+              subject: CGI.escapeHTML(e[2]),
+              date: e[3],
+              unread: e[4],
+              user: user_names[e[5]]
           }
         end
         {info: {page: page, pages: pages, unread: unread}, emails: emails}
