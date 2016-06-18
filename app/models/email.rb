@@ -77,7 +77,7 @@ class Email < ActiveRecord::Base
           end
         end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map {|e| e[0]}
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = Email.where(id: email_ids).order(date: :desc).offset(offset).limit(EMAILS_PER_PAGE).map do |e|
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
