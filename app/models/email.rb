@@ -27,10 +27,10 @@ class Email < ActiveRecord::Base
   def self.delete_old_unapproved(user)
     unless user.allow_unapproved
       deleteables = Email.where(user: user)
-                      .where.not(encrypted_sender: friendly_emails(user))
-                      .where(sent: false)
-                      .where(deleted: [false, nil])
-                      .where("date < #{Time.now.to_i - 604800}")
+                        .where.not(encrypted_sender: friendly_emails(user))
+                        .where(sent: false)
+                        .where(deleted: [false, nil])
+                        .where("date < #{Time.now.to_i - 604800}")
       deleteables.each do |d|
         d[:deleted] = true
         d.save
@@ -41,17 +41,18 @@ class Email < ActiveRecord::Base
   def self.sync_mailbox(user, mailbox_type='inbox', page=1)
     page = page.to_i
     page = (page < 1) ? 1 : page
+    offset = (page - 1) * EMAILS_PER_PAGE
     case mailbox_type
       when 'sent'
         emails = Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
-                   .where(user_id: user.id)
-                   .where(sent: true)
-                   .map do |e|
+                     .where(user_id: user.id)
+                     .where(sent: true)
+                     .map do |e|
           {
-            id: e.id,
-            recipients: truncate(e.recipients),
-            subject: CGI.escapeHTML(e.subject),
-            date: e.date
+              id: e.id,
+              recipients: truncate(e.recipients),
+              subject: CGI.escapeHTML(e.subject),
+              date: e.date
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -60,29 +61,31 @@ class Email < ActiveRecord::Base
       when 'archived'
         users = [user] + user.secondary_users
         user_names = {}
-        emails = users.map do |u|
+        email_ids = users.map do |u|
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
             Email.where(user_id: u.id)
-              .where(deleted: [false, nil])
-              .where(archived: true)
+                .where(deleted: [false, nil])
+                .where(archived: true)
+                .pluck(:id, :date)
           else
             Email.where(user_id: u.id)
-              .where(encrypted_sender: friendly_emails(u))
-              .where(deleted: [false, nil])
-              .where(archived: true)
+                .where(encrypted_sender: friendly_emails(u))
+                .where(deleted: [false, nil])
+                .where(archived: true)
+                .pluck(:id, :date)
           end
-        end.flatten.compact.map do |e|
+        end.flatten(1).compact.sort { |x, y| y[:date] <=> x[:date] }.map {|e| e[0]}
+        pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = Email.where(id: email_ids).order(date: desc).offset(offset).limit(EMAILS_PER_PAGE).map do |e|
           {
-            id: e.id,
-            sender: truncate(e.sender),
-            subject: CGI.escapeHTML(e.subject),
-            date: e.date,
-            user: user_names[e.user_id]
+              id: e.id,
+              sender: truncate(e.sender),
+              subject: CGI.escapeHTML(e.subject),
+              date: e.date,
+              user: user_names[e.user_id]
           }
-        end.sort { |x, y| y[:date] <=> x[:date] }
-        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        end
         {info: {page: page, pages: pages}, emails: emails}
       when 'unapproved'
         users = [user] + user.secondary_users
@@ -94,19 +97,19 @@ class Email < ActiveRecord::Base
             nil
           else
             email_relation = Email.where(user_id: u.id)
-                               .where.not(encrypted_sender: friendly_emails(u))
-                               .where(sent: false)
-                               .where(deleted: [false, nil])
+                                 .where.not(encrypted_sender: friendly_emails(u))
+                                 .where(sent: false)
+                                 .where(deleted: [false, nil])
             unread += email_relation.where(unread: true).count
             email_relation
           end
         end.flatten.compact.map do |e|
           {
-            id: e.id,
-            sender: truncate(e.sender),
-            date: e.date,
-            unread: e.unread,
-            user: user_names[e.user_id]
+              id: e.id,
+              sender: truncate(e.sender),
+              date: e.date,
+              unread: e.unread,
+              user: user_names[e.user_id]
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -120,28 +123,28 @@ class Email < ActiveRecord::Base
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
             email_relation = Email.where(user_id: u.id)
-                               .where(archived: false)
-                               .where(sent: false)
-                               .where(deleted: [false, nil])
+                                 .where(archived: false)
+                                 .where(sent: false)
+                                 .where(deleted: [false, nil])
             unread += email_relation.where(unread: true).count
             email_relation
           else
             email_relation = Email.where(user_id: u.id)
-                               .where(encrypted_sender: friendly_emails(u))
-                               .where(archived: false)
-                               .where(sent: false)
-                               .where(deleted: [false, nil])
+                                 .where(encrypted_sender: friendly_emails(u))
+                                 .where(archived: false)
+                                 .where(sent: false)
+                                 .where(deleted: [false, nil])
             unread += email_relation.where(unread: true).count
             email_relation
           end
         end.flatten.compact.map do |e|
           {
-            id: e.id,
-            sender: truncate(e.sender),
-            subject: CGI.escapeHTML(e.subject),
-            date: e.date,
-            unread: e.unread,
-            user: user_names[e.user_id]
+              id: e.id,
+              sender: truncate(e.sender),
+              subject: CGI.escapeHTML(e.subject),
+              date: e.date,
+              unread: e.unread,
+              user: user_names[e.user_id]
           }
         end.sort { |x, y| y[:date] <=> x[:date] }
         pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
@@ -212,13 +215,13 @@ class Email < ActiveRecord::Base
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
     {
-      recipients: current_user.allow_unapproved? ? orig_recipients.join(', ') : recipient_ids,
-      friends: friends,
-      subject: new_subject,
-      reply_text: reply_text,
-      is_reply: true,
-      thread_participant_count: orig_recipients.size,
-      allow_unapproved: current_user.allow_unapproved
+        recipients: current_user.allow_unapproved? ? orig_recipients.join(', ') : recipient_ids,
+        friends: friends,
+        subject: new_subject,
+        reply_text: reply_text,
+        is_reply: true,
+        thread_participant_count: orig_recipients.size,
+        allow_unapproved: current_user.allow_unapproved
     }
   end
 
