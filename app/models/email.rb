@@ -92,19 +92,26 @@ class Email < ActiveRecord::Base
         users = [user] + user.secondary_users
         user_names = {}
         unread = 0
-        emails = users.map do |u|
+        email_ids = users.map do |u|
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
             nil
           else
-            email_relation = Email.where(user_id: u.id)
-                                 .where.not(encrypted_sender: friendly_emails(u))
-                                 .where(sent: false)
-                                 .where(deleted: [false, nil])
-            unread += email_relation.where(unread: true).count
-            email_relation
+            unread += Email.where(user_id: u.id)
+                          .where.not(encrypted_sender: friendly_emails(u))
+                          .where(sent: false)
+                          .where(deleted: [false, nil])
+                          .where(unread: true)
+                          .count
+            Email.where(user_id: u.id)
+                .where.not(encrypted_sender: friendly_emails(u))
+                .where(sent: false)
+                .where(deleted: [false, nil])
+                .pluck(:id, :date)
           end
-        end.flatten.compact.map do |e|
+        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+        pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -112,9 +119,7 @@ class Email < ActiveRecord::Base
               unread: e.unread,
               user: user_names[e.user_id]
           }
-        end.sort { |x, y| y[:date] <=> x[:date] }
-        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        end
         {info: {page: page, pages: pages, unread: unread}, emails: emails}
       else # inbox
         users = [user] + user.secondary_users
