@@ -11,9 +11,10 @@ class Email < ActiveRecord::Base
   attr_encrypted :body, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
 
   EMAILS_PER_PAGE = 8
+  ENCRYPTED = ENV['ENCRYPT_EMAIL_DATA'] == 'true'
 
   def self.friendly_emails(user)
-    if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
+    if ENCRYPTED
       user.friends.select(:email).map { |friend| Email.encrypt_sender(friend.email) }
     else
       user.friends.select(:email)
@@ -56,8 +57,8 @@ class Email < ActiveRecord::Base
                      .map do |e|
           {
               id: e[0],
-              recipients: truncate(e[1]),
-              subject: CGI.escapeHTML(e[2]),
+              recipients: truncate(ENCRYPTED ? Email.decrypt_recipients(e[1]) : e[1]),
+              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[2]) : e[2]),
               date: e[3]
           }
         end
@@ -87,8 +88,8 @@ class Email < ActiveRecord::Base
                      .map do |e|
           {
               id: e[0],
-              sender: truncate(e[1]),
-              subject: CGI.escapeHTML(e[2]),
+              sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
+              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[2]) : e[2]),
               date: e[3],
               user: user_names[e[4]]
           }
@@ -123,7 +124,7 @@ class Email < ActiveRecord::Base
                      .map do |e|
           {
               id: e[0],
-              sender: truncate(e[1]),
+              sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
               date: e[2],
               unread: e[3],
               user: user_names[e[4]]
@@ -171,8 +172,8 @@ class Email < ActiveRecord::Base
                      .map do |e|
           {
               id: e[0],
-              sender: truncate(e[1]),
-              subject: CGI.escapeHTML(e[2]),
+              sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
+              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[2]) : e[2]),
               date: e[3],
               unread: e[4],
               user: user_names[e[5]]
