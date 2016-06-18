@@ -44,19 +44,20 @@ class Email < ActiveRecord::Base
     offset = (page - 1) * EMAILS_PER_PAGE
     case mailbox_type
       when 'sent'
-        emails = Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
-                     .where(user_id: user.id)
-                     .where(sent: true)
-                     .map do |e|
+        email_ids = Email.select(:id, :encrypted_recipients, :encrypted_subject, :date)
+                        .where(user_id: user.id)
+                        .where(sent: true)
+                        .pluck(:id, :date)
+                        .sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+        pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
           {
               id: e.id,
               recipients: truncate(e.recipients),
               subject: CGI.escapeHTML(e.subject),
               date: e.date
           }
-        end.sort { |x, y| y[:date] <=> x[:date] }
-        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        end
         {info: {page: page, pages: pages}, emails: emails}
       when 'archived'
         users = [user] + user.secondary_users
@@ -75,7 +76,7 @@ class Email < ActiveRecord::Base
                 .where(archived: true)
                 .pluck(:id, :date)
           end
-        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map {|e| e[0]}
+        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
           {
@@ -119,25 +120,38 @@ class Email < ActiveRecord::Base
         users = [user] + user.secondary_users
         user_names = {}
         unread = 0
-        emails = users.map do |u|
+        email_ids = users.map do |u|
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
-            email_relation = Email.where(user_id: u.id)
-                                 .where(archived: false)
-                                 .where(sent: false)
-                                 .where(deleted: [false, nil])
-            unread += email_relation.where(unread: true).count
-            email_relation
+            unread += Email.where(user_id: u.id)
+                          .where(archived: false)
+                          .where(sent: false)
+                          .where(deleted: [false, nil])
+                          .where(unread: true)
+                          .count
+            Email.where(user_id: u.id)
+                .where(archived: false)
+                .where(sent: false)
+                .where(deleted: [false, nil])
+                .pluck(:id, :date)
           else
-            email_relation = Email.where(user_id: u.id)
-                                 .where(encrypted_sender: friendly_emails(u))
-                                 .where(archived: false)
-                                 .where(sent: false)
-                                 .where(deleted: [false, nil])
-            unread += email_relation.where(unread: true).count
-            email_relation
+            unread += Email.where(user_id: u.id)
+                          .where(encrypted_sender: friendly_emails(u))
+                          .where(archived: false)
+                          .where(sent: false)
+                          .where(deleted: [false, nil])
+                          .where(unread: true)
+                          .count
+            Email.where(user_id: u.id)
+                .where(encrypted_sender: friendly_emails(u))
+                .where(archived: false)
+                .where(sent: false)
+                .where(deleted: [false, nil])
+                .pluck(:id, :date)
           end
-        end.flatten.compact.map do |e|
+        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+        pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
+        emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE)).order(date: :desc).map do |e|
           {
               id: e.id,
               sender: truncate(e.sender),
@@ -146,14 +160,12 @@ class Email < ActiveRecord::Base
               unread: e.unread,
               user: user_names[e.user_id]
           }
-        end.sort { |x, y| y[:date] <=> x[:date] }
-        pages = (emails.size.to_f / EMAILS_PER_PAGE).ceil
-        emails = emails.slice((page - 1) * EMAILS_PER_PAGE, EMAILS_PER_PAGE)
+        end
         {info: {page: page, pages: pages, unread: unread}, emails: emails}
     end
   end
 
-  # wrap http and https urls in <a> tags so the user can click on them
+# wrap http and https urls in <a> tags so the user can click on them
   def linkify_urls(str)
     str.gsub(/(?<url>((?:(http|https|Http|Https|rtsp|Rtsp):\/\/(?:(?:[a-zA-Z0-9\$\-\_\.\+\!\*'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,64}(?:\:(?:[a-zA-Z0-9\$\-\_\.\+\!\*'\(\)\,\;\?\&\=]|(?:\%[a-fA-F0-9]{2})){1,25})?\@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?:\:\d{1,5})?)(\/(?:(?:[a-zA-Z0-9\;\/\?\:\@\&\=\#\~\-\.\+\!\*'\(\)\,\_])|(?:\%[a-fA-F0-9]{2}))*)?)/, '<a href="\k<url>">\k<url></a>')
   end
