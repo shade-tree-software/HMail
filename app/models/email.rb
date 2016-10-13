@@ -26,16 +26,26 @@ class Email < ActiveRecord::Base
   end
 
   def self.delete_old_unapproved(user)
-    unless user.allow_unapproved
+    if user.allow_unapproved
+      if user.subject_required
+        deleteables = Email.where(user: user)
+                          .where(encrypted_subject: ENCRYPTED ? Email.encrypt_subject('(no subject)') : '(no subject)')
+                          .where(sent: false)
+                          .where(deleted: [false, nil])
+                          .where("date < #{Time.now.to_i - 604800}")
+      else
+        deleteables = []
+      end
+    else
       deleteables = Email.where(user: user)
                         .where.not(encrypted_sender: friendly_emails(user))
                         .where(sent: false)
                         .where(deleted: [false, nil])
                         .where("date < #{Time.now.to_i - 604800}")
-      deleteables.each do |d|
-        d[:deleted] = true
-        d.save
-      end
+    end
+    deleteables.each do |d|
+      d[:deleted] = true
+      d.save
     end
   end
 
@@ -104,7 +114,6 @@ class Email < ActiveRecord::Base
           if u.allow_unapproved
             if u.subject_required
               unread += Email.where(user_id: u.id)
-                            .where(archived: false)
                             .where(sent: false)
                             .where(deleted: [false, nil])
                             .where(unread: true)
