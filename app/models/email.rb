@@ -102,7 +102,23 @@ class Email < ActiveRecord::Base
         email_ids = users.map do |u|
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
-            nil
+            if u.subject_required
+              unread += Email.where(user_id: u.id)
+                            .where(archived: false)
+                            .where(sent: false)
+                            .where(deleted: [false, nil])
+                            .where(unread: true)
+                            .where(subject: '(no subject)')
+                            .count
+              Email.where(user_id: u.id)
+                  .where(archived: false)
+                  .where(sent: false)
+                  .where(deleted: [false, nil])
+                  .where(subject: '(no subject)')
+                  .pluck(:id, :date)
+            else
+              nil
+            end
           else
             unread += Email.where(user_id: u.id)
                           .where.not(encrypted_sender: friendly_emails(u))
@@ -138,17 +154,33 @@ class Email < ActiveRecord::Base
         email_ids = users.map do |u|
           user_names[u.id] = u.email.gsub!('@gmail.com', '')
           if u.allow_unapproved
-            unread += Email.where(user_id: u.id)
-                          .where(archived: false)
-                          .where(sent: false)
-                          .where(deleted: [false, nil])
-                          .where(unread: true)
-                          .count
-            Email.where(user_id: u.id)
-                .where(archived: false)
-                .where(sent: false)
-                .where(deleted: [false, nil])
-                .pluck(:id, :date)
+            if u.subject_required
+              unread += Email.where(user_id: u.id)
+                            .where(archived: false)
+                            .where(sent: false)
+                            .where(deleted: [false, nil])
+                            .where(unread: true)
+                            .where.not(subject: '(no subject)')
+                            .count
+              Email.where(user_id: u.id)
+                  .where(archived: false)
+                  .where(sent: false)
+                  .where(deleted: [false, nil])
+                  .where.not(subject: '(no subject)')
+                  .pluck(:id, :date)
+            else
+              unread += Email.where(user_id: u.id)
+                            .where(archived: false)
+                            .where(sent: false)
+                            .where(deleted: [false, nil])
+                            .where(unread: true)
+                            .count
+              Email.where(user_id: u.id)
+                  .where(archived: false)
+                  .where(sent: false)
+                  .where(deleted: [false, nil])
+                  .pluck(:id, :date)
+            end
           else
             unread += Email.where(user_id: u.id)
                           .where(encrypted_sender: friendly_emails(u))
