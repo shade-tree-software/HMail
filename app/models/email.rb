@@ -108,13 +108,13 @@ class Email < ActiveRecord::Base
                             .where(sent: false)
                             .where(deleted: [false, nil])
                             .where(unread: true)
-                            .where(subject: '(no subject)')
+                            .where(subject: ENCRYPTED ? Email.decrypt_subject('(no subject)') : '(no subject)')
                             .count
               Email.where(user_id: u.id)
                   .where(archived: false)
                   .where(sent: false)
                   .where(deleted: [false, nil])
-                  .where(subject: '(no subject)')
+                  .where(subject: ENCRYPTED ? Email.decrypt_subject('(no subject)') : '(no subject)')
                   .pluck(:id, :date)
             else
               nil
@@ -160,13 +160,13 @@ class Email < ActiveRecord::Base
                             .where(sent: false)
                             .where(deleted: [false, nil])
                             .where(unread: true)
-                            .where.not(subject: '(no subject)')
+                            .where.not(subject: ENCRYPTED ? Email.decrypt_subject('(no subject)') : '(no subject)')
                             .count
               Email.where(user_id: u.id)
                   .where(archived: false)
                   .where(sent: false)
                   .where(deleted: [false, nil])
-                  .where.not(subject: '(no subject)')
+                  .where.not(subject: ENCRYPTED ? Email.decrypt_subject('(no subject)') : '(no subject)')
                   .pluck(:id, :date)
             else
               unread += Email.where(user_id: u.id)
