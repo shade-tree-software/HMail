@@ -121,7 +121,13 @@ class EmailsController < ApplicationController
     #users_queued = QueueClassicJob.select(:args).collect { |job| job.args[0]['arguments'][0] }
     #PopJob.perform_later(current_user.id) unless users_queued.include? current_user.id
     PopJob.perform_later(current_user.id)
-    current_user.secondary_users.each do |secondary_user|
+    secondary_users = current_user.secondary_users
+    if params[:secondary_users] == 'odd'
+      secondary_users.select!.with_index {|_, i| i.odd?}
+    elsif params[:secondary_users] == 'even'
+      secondary_users.select!.with_index {|_, i| i.even?}
+    end
+    secondary_users.each do |secondary_user|
       PopJob.perform_later(secondary_user.id, 1)
     end
     render nothing: true
