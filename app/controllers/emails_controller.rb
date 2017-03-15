@@ -22,6 +22,10 @@ class EmailsController < ApplicationController
   def show
     @email.unread = false
     @email.save
+    respond_to do |format|
+      format.html
+      format.json { render json: @email }
+    end
   end
 
 
@@ -123,9 +127,9 @@ class EmailsController < ApplicationController
     PopJob.perform_later(current_user.id)
     secondary_users = current_user.secondary_users
     if params[:secondary_users] == 'odd'
-      secondary_users = secondary_users.map {|n| n}.select.each_with_index {|_, i| i.odd?}
+      secondary_users = secondary_users.map { |n| n }.select.each_with_index { |_, i| i.odd? }
     elsif params[:secondary_users] == 'even'
-      secondary_users = secondary_users.map {|n| n}.select.each_with_index {|_, i| i.even?}
+      secondary_users = secondary_users.map { |n| n }.select.each_with_index { |_, i| i.even? }
     end
     secondary_users.each do |secondary_user|
       PopJob.perform_later(secondary_user.id, 1)
