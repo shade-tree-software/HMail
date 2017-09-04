@@ -11,9 +11,9 @@
       </tr>
       </thead>
       <tbody>
-      <%= @basic_emails.each do |basic_email| %>
-          <tr><%= basic_email[:sender] %></tr>
-          <tr><% basic_email[:subject] %></tr>
+      <% @basic_emails.each do |basic_email| %>
+          <tr><%= basic_email['sender'] %></tr>
+          <tr><%= basic_email['subject'] %></tr>
           <tr>
             <a href="#">Open</a>
           </tr>
