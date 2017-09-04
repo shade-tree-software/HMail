@@ -22,7 +22,7 @@ class EmailsController < ApplicationController
   def simple
     respond_to do |format|
       format.html do
-        @basic_emails = Email.sync_mailbox(current_user, params[:mailbox_type], params[:page]).emails
+        @basic_emails = Email.sync_mailbox(current_user, params[:mailbox_type], params[:page])[:emails]
       end
     end
   end
