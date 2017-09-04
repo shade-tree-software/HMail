@@ -1,0 +1,26 @@
+<div class="off-canvas-wrap" style="min-height: 500px" data-offcanvas>
+  <div class="inner-wrap">
+    <%= render 'layouts/top_bar' %>
+
+    <table>
+      <thead>
+      <tr>
+        <th>Sender</th>
+        <th>Subject</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <%= @basic_emails.each do |basic_email| %>
+          <tr><%= basic_email[:sender] %></tr>
+          <tr><% basic_email[:subject] %></tr>
+          <tr>
+            <a href="#">Open</a>
+          </tr>
+       <% end %>
+      </tbody>
+    </table>
+  </div>
+
+
+</div>

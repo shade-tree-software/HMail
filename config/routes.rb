@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       get 'refresh'
       get 'refresh_all'
       get 'auto_refresh'
+      get 'simple'
     end
   end
 
