@@ -20,6 +20,7 @@ class EmailsController < ApplicationController
   end
 
   def simple
+    PopJob.perform_later(current_user.id)
     respond_to do |format|
       format.html do
         @basic_emails = Email.sync_mailbox(current_user, params[:mailbox_type], params[:page])[:emails]
