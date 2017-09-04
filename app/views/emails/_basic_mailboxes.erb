@@ -2,25 +2,13 @@
   <div class="inner-wrap">
     <%= render 'layouts/top_bar' %>
 
-    <table>
-      <thead>
-      <tr>
-        <th>Sender</th>
-        <th>Subject</th>
-        <th></th>
-      </tr>
-      </thead>
-      <tbody>
+    <ul>
       <% @basic_emails.each do |basic_email| %>
-          <tr><%= basic_email[:sender] %></tr>
-          <tr><%= basic_email[:subject] %></tr>
-          <tr>
-            <a href=<%= "/emails/#{basic_email[:id]}"%>>Open</a>
-          </tr>
-       <% end %>
-      </tbody>
-    </table>
+          <li>
+            <p>From: <%= basic_email[:sender] %></p>
+            <p>Subject: <a href=<%= "/emails/#{basic_email[:id]}" %>><%= basic_email[:subject] %></a></p>
+          </li>
+      <% end %>
+    </ul>
   </div>
-
-
 </div>
