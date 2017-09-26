@@ -23,7 +23,7 @@ class PopJob < ActiveJob::Base
         # get mail messages from pop server
         mails = Mail.last(:count => count)
         #mails = Mail.all
-        
+
         # insert messages into database only if they are unique (sometimes we get duplicates
         # from the pop server)
         if mails
@@ -57,17 +57,17 @@ class PopJob < ActiveJob::Base
               # by the other process and should not try to create the duplicate.
               retry
             rescue StandardError => e
-              puts 'Failed to store retrieved email.  ' + e.message
+              puts "Failed to store retrieved email for user_id(#{user_id}).  #{e.message}"
             rescue Exception => e
-              puts 'Failed to store retrieved email.  ' + e.message
+              puts "Failed to store retrieved email for user_id(#{user_id}).  #{e.message}"
               raise e
             end
           end
         end
       rescue Net::POPAuthenticationError => e
-        puts 'Authentication Error.  Unable to POP from GMail.  ' + e.message
+        puts "Authentication Error for user_id(#{user_id}).  Unable to POP from GMail.  #{e.message}"
       rescue Exception => e
-        puts 'Unable to POP from GMail.  ' + e.message
+        puts "Exception caught for user_id(#{user_id}).  Unable to POP from GMail.  #{e.message}"
       end
 
     else
