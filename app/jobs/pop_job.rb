@@ -66,11 +66,11 @@ class PopJob < ActiveJob::Base
         end
       rescue Net::POPAuthenticationError => e
         puts "Authentication Error for user_id(#{user_id}).  Unable to POP from GMail.  #{e.message}"
-        user.pop_error = true
+        user[:pop_error] = true
         user.save
       rescue Exception => e
         puts "Exception caught for user_id(#{user_id}).  Unable to POP from GMail.  #{e.message}"
-        user.pop_error = true
+        user[:pop_error] = true
         user.save
       end
 
