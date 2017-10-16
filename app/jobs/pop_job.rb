@@ -64,6 +64,9 @@ class PopJob < ActiveJob::Base
             end
           end
         end
+        if user.pop_error
+          ActiveRecord::Base.connection.execute('update users set pop_error=false where id=' + user.id.to_s)
+        end
       rescue Net::POPAuthenticationError => e
         puts "Authentication Error for user_id(#{user_id}).  Unable to POP from GMail.  #{e.message}"
         ActiveRecord::Base.connection.execute('update users set pop_error=true where id=' + user.id.to_s)
