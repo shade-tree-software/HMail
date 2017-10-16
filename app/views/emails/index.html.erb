@@ -522,6 +522,7 @@
       var unapprovedView = new UnapprovedView();
 
       var popSuccess = function(data){
+        console.log(JSON.stringify(data));
         if (data.bad_emails && data.bad_emails.length > 0){
           var preamble = 'Unable to get info from GMail for the following accounts: ';
           $("#bad-emails").html(preamble + data.bad_emails).addClass("alert-box");
