@@ -143,7 +143,14 @@ class EmailsController < ApplicationController
     secondary_users.each do |secondary_user|
       PopJob.perform_later(secondary_user.id, 1)
     end
-    render nothing: true
+    bad_emails = current_user.secondary_users.where(pop_error: true).map do |user|
+      user.email.gsub('@gmail.com', '')
+    end
+    if current_user.pop_error
+      bad_emails << current_user.email.gsub('@gmail.com', '')
+    end
+
+    render json: {bad_emails: bad_emails.join(', ')}
   end
 
   def refresh_all
