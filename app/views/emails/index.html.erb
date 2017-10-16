@@ -8,6 +8,7 @@
 
   <script type="text/template" id="inbox-template">
     <div data-alert class="server-alert alert"></div>
+    <div data-alert id="bad-emails" class="alert"></div>
     <div class="row">
       <div class="large-8 columns">
         <div data-alert class="alert-box info">
@@ -520,10 +521,20 @@
       var archivedView = new ArchivedView();
       var unapprovedView = new UnapprovedView();
 
+      var popSuccess = function(data){
+        if (data.bad_emails && data.bad_emails.length > 0){
+          var preamble = 'Unable to get info from GMail for the following accounts: ';
+          $("#bad-emails").html(preamble + data.bad_emails).addClass("alert-box");
+        }else{
+          $("#bad-emails").html('').removeClass("alert-box");
+        }
+        onSuccess();
+      };
+
       var pop = function () {
-        $.get("/emails/refresh", {secondary_users: 'even'}).fail(onFailure).success(onSuccess);
+        $.get("/emails/refresh", {secondary_users: 'even'}, popSuccess).fail(onFailure);
         setTimeout(function(){
-          $.get("/emails/refresh", {secondary_users: 'odd'}).fail(onFailure).success(onSuccess);
+          $.get("/emails/refresh", {secondary_users: 'odd'}, popSuccess).fail(onFailure);
         }, 60000);
       };
 
