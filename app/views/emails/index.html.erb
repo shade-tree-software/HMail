@@ -8,7 +8,6 @@
 
   <script type="text/template" id="inbox-template">
     <div data-alert class="server-alert alert"></div>
-    <div data-alert id="bad-emails" class="alert"></div>
     <div class="row">
       <div class="large-8 columns">
         <div data-alert class="alert-box info">
@@ -525,9 +524,9 @@
         console.log(JSON.stringify(data));
         if (data.bad_emails && data.bad_emails.length > 0){
           var preamble = 'Unable to get info from GMail for the following accounts: ';
-          $("#bad-emails").html(preamble + data.bad_emails).addClass("alert-box");
+          $(".bad-emails").html(preamble + data.bad_emails).addClass("alert-box");
         }else{
-          $("#bad-emails").html('').removeClass("alert-box");
+          $(".bad-emails").html('').removeClass("alert-box");
         }
         onSuccess();
       };
