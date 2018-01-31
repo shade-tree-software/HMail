@@ -36,7 +36,11 @@
     <%= @email.recipients %>
     <br>
     <strong>From:</strong>
-    <%= @email.sender_name + ' <' + @email.sender + '>' %>
+    <% if @email.sender_name && !@email.sender_name.empty? %>
+        <%= @email.sender_name + ' <' + @email.sender + '>' %>
+    <% else %>
+        <%= @email.sender %>
+    <% end %>
     <br>
     <strong>Subject:</strong>
     <%= @email.subject %>

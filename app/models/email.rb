@@ -100,7 +100,7 @@ class Email < ActiveRecord::Base
           {
               id: e[0],
               sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
-              sender_name: ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2],
+              sender_name: (ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2]) || '',
               subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[3]) : e[3]),
               date: e[4],
               user: user_names[e[5]]
@@ -152,7 +152,7 @@ class Email < ActiveRecord::Base
           {
               id: e[0],
               sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
-              sender_name: ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2],
+              sender_name: (ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2]) || '',
               date: e[3],
               unread: e[4],
               user: user_names[e[5]]
@@ -217,7 +217,7 @@ class Email < ActiveRecord::Base
           {
               id: e[0],
               sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
-              sender_name: ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2],
+              sender_name: (ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2]) || '',
               subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[3]) : e[3]),
               date: e[4],
               unread: e[5],
