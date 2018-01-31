@@ -6,6 +6,7 @@ class Email < ActiveRecord::Base
   attr_accessor :message
 
   attr_encrypted :sender, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
+  attr_encrypted :sender_name, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
   attr_encrypted :recipients, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
   attr_encrypted :subject, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
   attr_encrypted :body, :key => ENV['ENCRYPTION_KEY'], :if => (ENV['ENCRYPT_EMAIL_DATA'] == 'true')
@@ -94,14 +95,15 @@ class Email < ActiveRecord::Base
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
-                     .pluck(:id, :encrypted_sender, :encrypted_subject, :date, :user_id)
+                     .pluck(:id, :encrypted_sender, :encrypted_sender_name, :encrypted_subject, :date, :user_id)
                      .map do |e|
           {
               id: e[0],
               sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
-              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[2]) : e[2]),
-              date: e[3],
-              user: user_names[e[4]]
+              sender_name: ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2],
+              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[3]) : e[3]),
+              date: e[4],
+              user: user_names[e[5]]
           }
         end
         {info: {page: page, pages: pages}, emails: emails}
@@ -145,14 +147,15 @@ class Email < ActiveRecord::Base
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
-                     .pluck(:id, :encrypted_sender, :date, :unread, :user_id)
+                     .pluck(:id, :encrypted_sender,  :encrypted_sender_name, :date, :unread, :user_id)
                      .map do |e|
           {
               id: e[0],
               sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
-              date: e[2],
-              unread: e[3],
-              user: user_names[e[4]]
+              sender_name: ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2],
+              date: e[3],
+              unread: e[4],
+              user: user_names[e[5]]
           }
         end
         {info: {page: page, pages: pages, unread: unread}, emails: emails}
@@ -209,15 +212,16 @@ class Email < ActiveRecord::Base
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
-                     .pluck(:id, :encrypted_sender, :encrypted_subject, :date, :unread, :user_id)
+                     .pluck(:id, :encrypted_sender, :encrypted_sender_name, :encrypted_subject, :date, :unread, :user_id)
                      .map do |e|
           {
               id: e[0],
               sender: truncate(ENCRYPTED ? Email.decrypt_sender(e[1]) : e[1]),
-              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[2]) : e[2]),
-              date: e[3],
-              unread: e[4],
-              user: user_names[e[5]]
+              sender_name: ENCRYPTED ? Email.decrypt_sender_name(e[2]) : e[2],
+              subject: CGI.escapeHTML(ENCRYPTED ? Email.decrypt_subject(e[3]) : e[3]),
+              date: e[4],
+              unread: e[5],
+              user: user_names[e[6]]
           }
         end
         {info: {page: page, pages: pages, unread: unread}, emails: emails}

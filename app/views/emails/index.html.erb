@@ -50,7 +50,7 @@
               <% end %>
               <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>From: <%%= email.get('sender') %></li>
+              <li>From: <%%= email.get('sender_name') + " &lt" + email.get('sender') + "&gt" %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
             </ul>
           </td>
@@ -84,7 +84,7 @@
           <% end %>
           <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('sender') %></td>
+          <td><%%= email.get('sender_name') + " &lt" + email.get('sender') + "&gt" %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
         </tr>
         <%% }); %>
@@ -203,7 +203,7 @@
               <% end %>
               <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>From: <%%= email.get('sender') %></li>
+              <li>From: <%%= email.get('sender_name') + " &lt" + email.get('sender') + "&gt" %></li>
               <li>Subject: <a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></li>
             </ul>
           </td>
@@ -233,7 +233,7 @@
           <% end %>
           <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('sender') %></td>
+          <td><%%= email.get('sender_name') + " &lt" + email.get('sender') + "&gt" %></td>
           <td><a href="/emails/<%%=email.get('id')%>"><%%= email.get('subject') %></a></td>
         </tr>
         <%% }); %>
@@ -289,7 +289,7 @@
               <% end %>
               <%% var date = new Date(email.get('date') * 1000) %>
               <li>Date: <%%= date.toLocaleString() %></li>
-              <li>From: <%%= email.get('sender') %></li>
+              <li>From: <%%= email.get('sender_name') + " &lt" + email.get('sender') + "&gt" %></li>
               <li>
                 <a href="/emails/<%%=email.get('id')%>" data-method="delete" data-confirm="Are you sure you want to delete this message?" class="tiny round button">Delete</a>
               </li>
@@ -325,7 +325,7 @@
           <% end %>
           <%% var date = new Date(email.get('date') * 1000) %>
           <td><%%= date.toLocaleString() %></td>
-          <td><%%= email.get('sender') %></td>
+          <td><%%= email.get('sender_name') + " &lt" + email.get('sender') + "&gt" %></td>
           <td>
             <a href="/emails/<%%=email.get('id')%>" data-method="delete" data-confirm="Are you sure you want to delete this message?" class="tiny round button">Delete</a>
           </td>

@@ -36,7 +36,7 @@
     <%= @email.recipients %>
     <br>
     <strong>From:</strong>
-    <%= @email.sender %>
+    <%= @email.sender_name + ' <' + @email.sender + '>' %>
     <br>
     <strong>Subject:</strong>
     <%= @email.subject %>

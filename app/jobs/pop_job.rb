@@ -33,10 +33,12 @@ class PopJob < ActiveJob::Base
               subject = mail.subject || '(no subject)'
               recipients = ((mail.to || []) + (mail.cc || [])).join(', ')
               sender = mail.from.first
+              sender_name = mail[:from].display_names.first
               if ENV['ENCRYPT_EMAIL_DATA'] == 'true'
                 subject = Email.encrypt_subject(subject)
                 recipients = Email.encrypt_recipients(recipients)
                 sender = Email.encrypt_sender(sender)
+                sender_name = Email.encrypt_sender_name(sender_name)
               end
               Email.find_or_create_by(
                   user_id: user.id,
@@ -49,6 +51,7 @@ class PopJob < ActiveJob::Base
                 new_email.sent = (mail.from.first.end_with?('@gmail.com') && (mail.from.first.delete('.') == user_name.delete('.')))
                 new_email.unread = true
                 new_email.deleted = false
+                new_email.encrypted_sender_name = sender_name
               end
             rescue ActiveRecord::RecordNotUnique
               # find_or_create_by is not atomic.  If we get a RecordNotUnique exception it
