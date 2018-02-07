@@ -1,86 +1,96 @@
 <%= form_for(@email) do |f| %>
-    <% if @email.errors.any? %>
-        <div id="error_explanation">
-          <h2><%= pluralize(@email.errors.count, "error") %> prohibited this email from being saved:</h2>
+  <% if @email.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@email.errors.count, "error") %> prohibited this email from being saved:</h2>
 
-          <ul>
-            <% @email.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
+      <ul>
+        <% @email.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="actions row">
+    <%= f.submit 'Send', {:class => 'medium round button'} %>
+  </div>
+
+  <div id="sendAlert" data-alert hidden class="row alert-box warning">
+  </div>
+  <div id="sendCount" data-alert hidden class="row alert-box info">
+  </div>
+
+  <% if @params[:sender] %>
+    <div class="field row">
+      <input type="hidden" name="email[sender]" value=<%= @params[:sender] %> />
+      <label for="sender">From:</label>
+      <input type="text" id="sender" value=<%= @params[:sender] %> disabled="disabled" />
+    </div>
+  <% end %>
+
+  <div class="field row">
+    <%= f.label :recipients %>
+    <% if @params[:allow_unapproved] %>
+      <%= f.text_field :recipients, :value => @params[:recipients], required: true %>
+    <% else %>
+      <%= f.select(:recipients,
+                   options_for_select(@params[:friends], @params[:recipients]),
+                   {},
+                   {multiple: true, style: 'height: auto', required: true}) %>
     <% end %>
-
-    <div class="actions row">
-      <%= f.submit 'Send', {:class => 'medium round button'} %>
-    </div>
-
-    <div id="sendAlert" data-alert hidden class="row alert-box warning">
-    </div>
-    <div id="sendCount" data-alert hidden class="row alert-box info">
-    </div>
-
-    <div class="field row">
-      <%= f.label :recipients %>
-      <% if @params[:allow_unapproved] %>
-          <%= f.text_field :recipients, :value => @params[:recipients], required: true %>
-      <% else %>
-          <%= f.select(:recipients,
-                       options_for_select(@params[:friends], @params[:recipients]),
-                       {},
-                       {multiple: true, style: 'height: auto', required: true}) %>
-      <% end %>
-    </div>
-    <div class="field row">
-      <%= f.label :subject %>
-      <%= f.text_field :subject, :value => @params[:subject] %>
-    </div>
-    <div class="field row">
-      <%= f.label :message %>
-      <%= f.text_area :message, :value => raw(@params[:reply_text]), :autofocus => @params[:is_reply] %>
-    </div>
-    <br>
-    <div class="field row">
-      <%= f.label :picture, 'Picture (optional):' %>
-      <%= f.file_field :picture, accept: 'image/gif,image/jpeg' %>
-    </div>
-    <br>
-    <div class="actions row">
-      <%= f.submit 'Send', {:class => 'medium round button'} %>
-    </div>
+  </div>
+  <div class="field row">
+    <%= f.label :subject %>
+    <%= f.text_field :subject, :value => @params[:subject] %>
+  </div>
+  <div class="field row">
+    <%= f.label :message %>
+    <%= f.text_area :message, :value => raw(@params[:reply_text]), :autofocus => @params[:is_reply] %>
+  </div>
+  <br>
+  <div class="field row">
+    <%= f.label :picture, 'Picture (optional):' %>
+    <%= f.file_field :picture, accept: 'image/gif,image/jpeg' %>
+  </div>
+  <br>
+  <div class="actions row">
+    <%= f.submit 'Send', {:class => 'medium round button'} %>
+  </div>
 <% end %>
 
 <script>
-  window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
-  var checkForMultipleRecipients = function () {
-    var recipientCount = jQuery('#email_to').find('option:selected').length;
-    if (recipientCount > 1) {
-      jQuery("#sendCount").html('You are sending to ' + recipientCount + ' people.').show();
-    } else {
-      jQuery("#sendCount").empty().hide();
+    window.threadParticipantCount = <%= "#{@params[:thread_participant_count]}" %>;
+    var checkForMultipleRecipients = function () {
+        var recipientCount = jQuery('#email_to').find('option:selected').length;
+        if (recipientCount > 1) {
+            jQuery("#sendCount").html('You are sending to ' + recipientCount + ' people.').show();
+        } else {
+            jQuery("#sendCount").empty().hide();
+        }
+    };
+    var checkForRecipientCountMismatch = function () {
+        var recipientCount = jQuery('#email_to').find('option:selected').length;
+        var missingParticipantCount = window.threadParticipantCount - recipientCount;
+        if (window.threadParticipantCount > 1 && recipientCount > 0 && missingParticipantCount > 0) {
+            jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".  If you send this message, the other " + (missingParticipantCount === 1 ? "person" : "people") + " will be removed from the conversation.").show();
+            jQuery("#sendCount").empty().hide();
+        } else {
+            jQuery("#sendAlert").empty().hide();
+            checkForMultipleRecipients();
+        }
+    };
+    checkForMultipleRecipients();
+    checkForRecipientCountMismatch();
+    jQuery("#email_to").change(checkForRecipientCountMismatch);
+
+    // set textareas to auto resize
+    function h(e) {
+        $(e).css({'height': 'auto', 'overflow-y': 'hidden'}).height(e.scrollHeight);
     }
-  };
-  var checkForRecipientCountMismatch = function () {
-    var recipientCount = jQuery('#email_to').find('option:selected').length;
-    var missingParticipantCount = window.threadParticipantCount - recipientCount;
-    if (window.threadParticipantCount > 1 && recipientCount > 0 && missingParticipantCount > 0) {
-      jQuery("#sendAlert").html("Warning: There were originally " + window.threadParticipantCount + " people in this conversation, but you are only replying to " + recipientCount + ".  If you send this message, the other " + (missingParticipantCount === 1 ? "person" : "people") + " will be removed from the conversation.").show();
-      jQuery("#sendCount").empty().hide();
-    } else {
-      jQuery("#sendAlert").empty().hide();
-      checkForMultipleRecipients();
-    }
-  };
-  checkForMultipleRecipients();
-  checkForRecipientCountMismatch();
-  jQuery("#email_to").change(checkForRecipientCountMismatch);
-  // set textareas to auto resize
-  function h(e) {
-    $(e).css({'height': 'auto', 'overflow-y': 'hidden'}).height(e.scrollHeight);
-  }
-  $('textarea').each(function () {
-    h(this);
-  }).on('input', function () {
-    h(this);
-  });
+
+    $('textarea').each(function () {
+        h(this);
+    }).on('input', function () {
+        h(this);
+    });
 </script>

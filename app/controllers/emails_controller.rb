@@ -62,6 +62,10 @@ class EmailsController < ApplicationController
   #end
 
   def create
+    puts 'sender would be: ' + params[:email][:sender]
+
+    #TODO: username and password need to be those of the sender, not the current user
+
     sender = current_user.email
     password = current_user.email_pw
     Mail.defaults do

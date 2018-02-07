@@ -274,11 +274,21 @@ class Email < ActiveRecord::Base
   end
 
   def build_reply(current_user)
-    orig_recipients = (recipients.delete(' ').split(',') << sender) - [current_user.email]
+    secondary_user_emails = current_user.secondary_users.map {|u| u.email}
+    orig_recipients = recipients.delete(' ').split(',')
+    new_sender = current_user.email
+    unless orig_recipients.include? (current_user.email)
+      # if the email wasn't sent to the current user, then it must have been sent to a secondary user
+      new_sender = (orig_recipients & secondary_user_emails).first
+    end
+
+    #TODO: Friends need to be those of the new sender, not the current user
+
+    all_recipients = ((orig_recipients << sender) - secondary_user_emails) - [current_user.email]
     friendly_emails = current_user.friends.map { |f| f.email }
     friendly_ids = current_user.friends.map { |f| f.id }
-    recipients = orig_recipients.select { |r| friendly_emails.include? r }
-    recipient_ids = recipients.map { |r| friendly_ids[friendly_emails.index(r)] }
+    friendly_recipients = all_recipients.select { |r| friendly_emails.include? r }
+    friendly_recipient_ids = friendly_recipients.map { |r| friendly_ids[friendly_emails.index(r)] }
     friends = current_user.friends.map do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
@@ -290,13 +300,14 @@ class Email < ActiveRecord::Base
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
     {
-        recipients: current_user.allow_unapproved? ? orig_recipients.join(', ') : recipient_ids,
+        recipients: current_user.allow_unapproved? ? all_recipients.join(', ') : friendly_recipient_ids,
         friends: friends,
         subject: new_subject,
         reply_text: reply_text,
         is_reply: true,
-        thread_participant_count: orig_recipients.size,
-        allow_unapproved: current_user.allow_unapproved
+        thread_participant_count: all_recipients.size,
+        allow_unapproved: current_user.allow_unapproved,
+        sender: new_sender
     }
   end
 
