@@ -62,7 +62,7 @@ class EmailsController < ApplicationController
   #end
 
   def create
-    puts 'sender would be: ' + params[:email][:sender]
+    puts 'sender would be: ' + params[:email][:sender] if params[:email][:sender]
 
     #TODO: username and password need to be those of the sender, not the current user
 
