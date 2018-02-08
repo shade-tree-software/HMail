@@ -62,22 +62,18 @@ class EmailsController < ApplicationController
   #end
 
   def create
-    puts 'sender would be: ' + params[:email][:sender] if params[:email][:sender]
-
-    #TODO: username and password need to be those of the sender, not the current user
-
-    sender = current_user.email
-    password = current_user.email_pw
+    sender = params[:email][:sender] ? (User.find_by email: params[:email][:sender]) : current_user
+    sender_email = sender.email
+    sender_password = sender.email_pw
     Mail.defaults do
       delivery_method :smtp, {:address => "smtp.gmail.com",
                               :port => 587,
-                              #:domain => 'your.host.name',
-                              :user_name => sender,
-                              :password => password,
+                              :user_name => sender_email,
+                              :password => sender_password,
                               :authentication => 'plain',
                               :enable_starttls_auto => true}
     end
-    if current_user.allow_unapproved
+    if sender.allow_unapproved
       recipients = params[:email][:recipients].delete(' ').split(/,|;/)
     else
       # reject any items from the recipients select that are blank,
@@ -89,7 +85,7 @@ class EmailsController < ApplicationController
     subj = params[:email][:subject]
     mail = Mail.new do
       to recipients
-      from sender
+      from sender_email
       subject subj
     end
 
@@ -102,14 +98,14 @@ class EmailsController < ApplicationController
     pic = params[:email][:picture]
     mail.attachments[pic.original_filename] = pic.read if pic
 
-    mail.deliver! unless current_user.email == 'none@nowhere.com'
+    mail.deliver! unless sender.email == 'none@nowhere.com' # used for testing and debugging
 
     @email = Email.new(:body => mail.to_s,
-                       :user_id => current_user.id,
+                       :user_id => sender.id,
                        :archived => false,
                        :sent => true,
                        :recipients => recipients.join(', '),
-                       :sender => sender,
+                       :sender => sender_email,
                        :subject => subj,
                        :date => mail.date.to_i,
                        :deleted => false)

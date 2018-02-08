@@ -16,13 +16,13 @@ class Email < ActiveRecord::Base
 
   def self.friendly_emails(user)
     if ENCRYPTED
-      user.friends.select(:email).map { |friend| Email.encrypt_sender(friend.email) }
+      user.friends.select(:email).map {|friend| Email.encrypt_sender(friend.email)}
     else
       user.friends.select(:email)
     end
   end
 
-  def self.truncate(string='', len=30)
+  def self.truncate(string = '', len = 30)
     (string.length > len) ? (string.slice(0, len).rstrip + '...') : string
   end
 
@@ -50,7 +50,7 @@ class Email < ActiveRecord::Base
     end
   end
 
-  def self.sync_mailbox(user, mailbox_type='inbox', page=1)
+  def self.sync_mailbox(user, mailbox_type = 'inbox', page = 1)
     page = page.to_i
     page = (page < 1) ? 1 : page
     offset = (page - 1) * EMAILS_PER_PAGE
@@ -60,7 +60,7 @@ class Email < ActiveRecord::Base
                         .where(user_id: user.id)
                         .where(sent: true)
                         .pluck(:id, :date)
-                        .sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+                        .sort {|x, y| y[1] <=> x[1]}.map {|e| e[0]}
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
@@ -91,7 +91,7 @@ class Email < ActiveRecord::Base
                 .where(archived: true)
                 .pluck(:id, :date)
           end
-        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+        end.flatten(1).compact.sort {|x, y| y[1] <=> x[1]}.map {|e| e[0]}
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
@@ -143,11 +143,11 @@ class Email < ActiveRecord::Base
                 .where(deleted: [false, nil])
                 .pluck(:id, :date)
           end
-        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+        end.flatten(1).compact.sort {|x, y| y[1] <=> x[1]}.map {|e| e[0]}
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
-                     .pluck(:id, :encrypted_sender,  :encrypted_sender_name, :date, :unread, :user_id)
+                     .pluck(:id, :encrypted_sender, :encrypted_sender_name, :date, :unread, :user_id)
                      .map do |e|
           {
               id: e[0],
@@ -208,7 +208,7 @@ class Email < ActiveRecord::Base
                 .where(deleted: [false, nil])
                 .pluck(:id, :date)
           end
-        end.flatten(1).compact.sort { |x, y| y[1] <=> x[1] }.map { |e| e[0] }
+        end.flatten(1).compact.sort {|x, y| y[1] <=> x[1]}.map {|e| e[0]}
         pages = (email_ids.size.to_f / EMAILS_PER_PAGE).ceil
         emails = Email.where(id: email_ids.slice(offset, EMAILS_PER_PAGE))
                      .order(date: :desc)
@@ -235,7 +235,7 @@ class Email < ActiveRecord::Base
 
   def assemble_parts(part, args)
     if part.multipart?
-      part.parts.collect { |sub_part| assemble_parts(sub_part, args) }.compact.join('')
+      part.parts.collect {|sub_part| assemble_parts(sub_part, args)}.compact.join('')
     else
       if part.content_type.nil?
         CGI.escapeHTML(part.body.to_s) # Not sure if this really works.  We don't seem to handle non-multipart messages correctly.
@@ -265,31 +265,39 @@ class Email < ActiveRecord::Base
   end
 
   def text(args = {})
-    if self.body.nil?
-      ''
+    if self.body.nil? || self.body.empty?
+      email_text = ''
     else
       @image_count = 0
-      assemble_parts Mail.read_from_string(self.body), args
+      email_text = assemble_parts Mail.read_from_string(self.body), args
     end
+    email_text || ''
   end
 
   def build_reply(current_user)
     secondary_user_emails = current_user.secondary_users.map {|u| u.email}
     orig_recipients = recipients.delete(' ').split(',')
-    new_sender = current_user.email
-    unless orig_recipients.include? (current_user.email)
-      # if the email wasn't sent to the current user, then it must have been sent to a secondary user
-      new_sender = (orig_recipients & secondary_user_emails).first
+    if orig_recipients.include? (current_user.email)
+      # If the current user was one of the original recipients,
+      # then we'll use the current user as the sender of the reply
+      reply_from_email = current_user.email
+    else
+      # if the email wasn't sent to the current user, then it must have been sent to one of the secondary users.
+      # Find out which secondary users were on the recipients list, and pick the first one.  If there weren't
+      # any secondary users on the recipients list then fall back to the current user.
+      reply_from_email = (orig_recipients & secondary_user_emails).first || current_user.email
     end
-
-    #TODO: Friends need to be those of the new sender, not the current user
-
-    all_recipients = ((orig_recipients << sender) - secondary_user_emails) - [current_user.email]
-    friendly_emails = current_user.friends.map { |f| f.email }
-    friendly_ids = current_user.friends.map { |f| f.id }
-    friendly_recipients = all_recipients.select { |r| friendly_emails.include? r }
-    friendly_recipient_ids = friendly_recipients.map { |r| friendly_ids[friendly_emails.index(r)] }
-    friends = current_user.friends.map do |friend|
+    reply_from_user = User.find_by email: reply_from_email
+    all_recipients = ((orig_recipients << sender) - secondary_user_emails)
+    unless all_recipients.size == 1 && all_recipients.first == current_user.email
+      # remove current user from recipients list unless current user is the only recipient
+      all_recipients = all_recipients - [current_user.email]
+    end
+    friendly_emails = reply_from_user.friends.map {|f| f.email}
+    friendly_ids = reply_from_user.friends.map {|f| f.id}
+    friendly_recipients = all_recipients.select {|r| friendly_emails.include? r}
+    friendly_recipient_ids = friendly_recipients.map {|r| friendly_ids[friendly_emails.index(r)]}
+    friends = reply_from_user.friends.map do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
     original_lines = text({text_only: true, no_links: true}).split("\n").collect do |line|
@@ -300,14 +308,14 @@ class Email < ActiveRecord::Base
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
     {
-        recipients: current_user.allow_unapproved? ? all_recipients.join(', ') : friendly_recipient_ids,
+        recipients: reply_from_user.allow_unapproved? ? all_recipients.join(', ') : friendly_recipient_ids,
         friends: friends,
         subject: new_subject,
         reply_text: reply_text,
         is_reply: true,
         thread_participant_count: all_recipients.size,
-        allow_unapproved: current_user.allow_unapproved,
-        sender: new_sender
+        allow_unapproved: reply_from_user.allow_unapproved,
+        sender: reply_from_email
     }
   end
 
