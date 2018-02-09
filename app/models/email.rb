@@ -274,30 +274,13 @@ class Email < ActiveRecord::Base
     email_text || ''
   end
 
-  def build_reply(current_user)
-    secondary_user_emails = current_user.secondary_users.map {|u| u.email}
-    orig_recipients = recipients.delete(' ').split(',')
-    if orig_recipients.include? (current_user.email)
-      # If the current user was one of the original recipients,
-      # then we'll use the current user as the sender of the reply
-      reply_from_email = current_user.email
-    else
-      # if the email wasn't sent to the current user, then it must have been sent to one of the secondary users.
-      # Find out which secondary users were on the recipients list, and pick the first one.  If there weren't
-      # any secondary users on the recipients list then fall back to the current user.
-      reply_from_email = (orig_recipients & secondary_user_emails).first || current_user.email
-    end
-    reply_from_user = User.find_by email: reply_from_email
-    all_recipients = ((orig_recipients << sender) - secondary_user_emails)
-    unless all_recipients.size == 1 && all_recipients.first == current_user.email
-      # remove current user from recipients list unless current user is the only recipient
-      all_recipients = all_recipients - [current_user.email]
-    end
-    friendly_emails = reply_from_user.friends.map {|f| f.email}
-    friendly_ids = reply_from_user.friends.map {|f| f.id}
+  def build_reply
+    all_recipients = (recipients.delete(' ').split(',') - [user.email]) << sender
+    friendly_emails = user.friends.map {|f| f.email}
+    friendly_ids = user.friends.map {|f| f.id}
     friendly_recipients = all_recipients.select {|r| friendly_emails.include? r}
     friendly_recipient_ids = friendly_recipients.map {|r| friendly_ids[friendly_emails.index(r)]}
-    friends = reply_from_user.friends.map do |friend|
+    friends = user.friends.map do |friend|
       [friend.first_name + ' ' + friend.last_name + ' <' + friend.email + '>', friend.id, {class: 'emailRecipient'}]
     end
     original_lines = text({text_only: true, no_links: true}).split("\n").collect do |line|
@@ -308,14 +291,14 @@ class Email < ActiveRecord::Base
     preamble = (subject.downcase.start_with? 're:') ? '' : 'Re: '
     new_subject = preamble + subject
     {
-        recipients: reply_from_user.allow_unapproved? ? all_recipients.join(', ') : friendly_recipient_ids,
+        recipients: user.allow_unapproved? ? all_recipients.join(', ') : friendly_recipient_ids,
         friends: friends,
         subject: new_subject,
         reply_text: reply_text,
         is_reply: true,
         thread_participant_count: all_recipients.size,
-        allow_unapproved: reply_from_user.allow_unapproved,
-        sender: reply_from_email
+        allow_unapproved: user.allow_unapproved,
+        sender: user.email
     }
   end
 

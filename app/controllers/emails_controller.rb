@@ -53,7 +53,7 @@ class EmailsController < ApplicationController
   end
 
   def reply
-    @params = @email.build_reply(current_user)
+    @params = @email.build_reply
     @email = Email.new
     render :action => :new
   end
